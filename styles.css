@@ -1,3 +1,15 @@
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.game-title {
+  font-size: 2.5rem;
+  color: #ffcc00;
+  text-shadow: 0 0 10px #ffcc00;
+}
+
+
 body{
     background-color: #0a0a23;
 }
@@ -38,4 +50,28 @@ button{
     background-color: #feac32;
     border: 3px solid #feac32;
     background-image: linear-gradient(#fecc4c, #ffac33);
+}
+
+
+@media (max-width: 600px) {
+  .game-title {
+    font-size: 2rem;
+  }
+
+  main {
+    padding: 15px;
+  }
+
+  #stats, #monsterStats {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #controls {
+    flex-direction: column;
+  }
+
+  button {
+    flex: 1 1 100%;
+  }
 }
