@@ -193,5 +193,30 @@ button{
     flex: 1 1 100%;
   }
 
+.modal-content {
+    width: 95%;
+    padding: 15px;
+    margin-top: 20%;
+  }
+
+  .auth-tabs {
+    flex-direction: column;
+  }
+
+  .auth-tab-btn {
+    padding: 10px;
+    text-align: center;
+  }
+
+  .auth-button {
+    padding: 10px;
+    font-size: 1rem;
+  }
+
+  .form-group input {
+    padding: 10px;
+  }
+
+
 
 }
