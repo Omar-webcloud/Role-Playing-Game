@@ -1,12 +1,119 @@
 header {
   text-align: center;
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .game-title {
   font-size: 2.5rem;
   color: #ffcc00;
   text-shadow: 0 0 10px #ffcc00;
+}
+
+#auth-status {
+  margin-top: 10px;
+  color: #ffffff;
+}
+
+#user-display {
+  margin-right: 10px;
+}
+
+#logout-button {
+  background-color: #c70d0d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+  background-color: #0a0a23;
+  margin: 10% auto;
+  padding: 20px;
+  border: 1px solid #feac32;
+  width: 80%;
+  max-width: 400px;
+  color: #ffffff;
+  border-radius: 5px;
+}
+
+.close {
+  color: #feac32;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Auth Form Styles */
+.auth-tabs {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  padding: 10px;
+  background-color: #0a0a23;
+  color: #ffffff;
+  border: 1px solid #feac32;
+  cursor: pointer;
+}
+
+.auth-tab-btn.active {
+  background-color: #feac32;
+  color: #0a0a23;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #feac32;
+  background-color: #ffffff;
+  color: #0a0a23;
+  border-radius: 3px;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #feac32;
+  color: #0a0a23;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 3px;
+}
+
+.error-message {
+  color: #ff6b6b;
+  margin-top: 10px;
+  font-size: 14px;
 }
 
 
@@ -48,6 +155,15 @@ button{
     cursor: pointer;
     color: #0a0a23;
     background-color: #feac32;
+}
+
+.save-btn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 3px;
     border: 3px solid #feac32;
     background-image: linear-gradient(#fecc4c, #ffac33);
 }

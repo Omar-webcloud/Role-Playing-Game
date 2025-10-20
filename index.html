@@ -7,36 +7,90 @@
 
     <title>RPG - Dragon Repeller</title>
     
-        
-    </script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
 <body>
     <header>
-    <h1 class="game-title">🐉 Dragon Repeller</h1>
-  </header>
+        <h1 class="game-title">🐉 Dragon Repeller</h1>
+        <div id="auth-status">
+            <span id="user-display"></span>
+            <button id="logout-button" style="display: none;">Logout</button>
+        </div>
+    </header>
 
-    <div id="game">
+    <!-- Authentication Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="auth-tabs">
+                <button class="auth-tab-btn active" data-tab="login">Login</button>
+                <button class="auth-tab-btn" data-tab="signup">Sign Up</button>
+            </div>
+            
+            <div id="login-tab" class="auth-tab-content">
+                <h2>Login</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email:</label>
+                        <input type="email" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password:</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="auth-button">Login</button>
+                </form>
+                <p id="login-error" class="error-message"></p>
+            </div>
+            
+            <div id="signup-tab" class="auth-tab-content" style="display: none;">
+                <h2>Sign Up</h2>
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label for="signup-email">Email:</label>
+                        <input type="email" id="signup-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password:</label>
+                        <input type="password" id="signup-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-confirm">Confirm Password:</label>
+                        <input type="password" id="signup-confirm" required>
+                    </div>
+                    <button type="submit" class="auth-button">Sign Up</button>
+                </form>
+                <p id="signup-error" class="error-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="game" style="display: none;">
         <div id="stats">
             <span class="stat">XP: <strong><span id="xpText">0</span></strong></span>
-        <span class="stat">Health: <strong><span id="healthText">100</span></strong></span>
-        <span class="stat">Gold: <strong><span id="goldText">50</span></strong></span>
+            <span class="stat">Health: <strong><span id="healthText">100</span></strong></span>
+            <span class="stat">Gold: <strong><span id="goldText">50</span></strong></span>
+            <button id="save-button" class="save-btn">Save Game</button>
         </div>
         <div id="controls">
             <button id="button1">Go to store</button>
             <button id="button2">Go to cave</button>
             <button id="button3">Fight dragon</button>
-
         </div>
         <div id="monsterStats">
-            <span class="stat">Monster Name: <strong><span id="monsterName"></span></strong></span></span>
+            <span class="stat">Monster Name: <strong><span id="monsterName"></span></strong></span>
             <span class="stat">Health: <strong><span id="monsterHealth"></span></strong></span>
-
         </div>
         <div id="text">
-Welcome to Dragon Repeller. You must defeat the dragon that is preventing people from leaving the town. You are in the town square. Where do you want to go? Use the buttons above.
+            Welcome to Dragon Repeller. You must defeat the dragon that is preventing people from leaving the town. You are in the town square. Where do you want to go? Use the buttons above.
         </div>
-
     </div>
-    <script src="script.js" ></script>
+
+    <!-- Firebase Config and Auth -->
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

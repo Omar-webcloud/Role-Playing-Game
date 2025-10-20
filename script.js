@@ -1,3 +1,4 @@
+// Game state variables
 let xp = 0;
 let health = 100;
 let gold = 50;
@@ -5,9 +6,11 @@ let currentWeaponIndex = 0;
 let fighting;
 let monsterHealth;
 let inventory = ["stick"];
+let currentUser = null;
 const button1 = document.querySelector("#button1");
 const button2 = document.querySelector("#button2");
 const button3 = document.querySelector("#button3");
+const saveButton = document.querySelector("#save-button");
 const text = document.querySelector("#text");
 const xpText = document.querySelector("#xpText");
 const healthText = document.querySelector("#healthText");
@@ -24,6 +27,104 @@ const weapons = [
 
 const monsters = [ {name: "slime", level: 2, health: 15}, {name: "fanged beast", level: 8, health: 60}, {name: "dragon", level: 20, health: 300} ];
 
+
+// Authentication state listener
+auth.onAuthStateChanged(user => {
+  if (user) {
+    currentUser = user;
+    // Load game data from MongoDB
+    loadGameData(user.uid);
+  } else {
+    currentUser = null;
+  }
+});
+
+// Function to save game data to MongoDB
+async function saveGameData() {
+  if (!currentUser) {
+    console.log("User not logged in, can't save data");
+    return;
+  }
+  
+  try {
+    const gameData = {
+      xp,
+      health,
+      gold,
+      inventory,
+      currentWeaponIndex
+    };
+    
+    // For GitHub Pages deployment - use environment-aware URL
+    const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:3000/api/save-game'
+      : 'https://dragon-repeller-server.vercel.app/api/save-game';
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        uid: currentUser.uid,
+        gameData
+      }),
+    });
+    
+    const data = await response.json();
+    console.log('Game saved:', data);
+    return data;
+  } catch (error) {
+    console.error('Error saving game:', error);
+  }
+}
+
+// Function to load game data from MongoDB
+async function loadGameData(uid) {
+  try {
+    // For GitHub Pages deployment - use environment-aware URL
+    const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? `http://localhost:3000/api/game-data/${uid}`
+      : `https://dragon-repeller-server.vercel.app/api/game-data/${uid}`;
+    
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    
+    if (data.gameData) {
+      // Update game state with saved data
+      xp = data.gameData.xp;
+      health = data.gameData.health;
+      gold = data.gameData.gold;
+      inventory = data.gameData.inventory;
+      currentWeaponIndex = data.gameData.currentWeaponIndex;
+      
+      // Update UI
+      update();
+    }
+  } catch (error) {
+    console.error('Error loading game data:', error);
+  }
+}
+
+// Auto-save game data periodically (every 30 seconds)
+setInterval(() => {
+  if (currentUser) {
+    saveGameData();
+  }
+}, 30000);
+
+// Save button event listener
+saveButton.addEventListener('click', () => {
+  if (currentUser) {
+    saveGameData();
+    text.innerText = "Game saved successfully!";
+    setTimeout(() => {
+      update();
+    }, 1500);
+  } else {
+    text.innerText = "You must be logged in to save your game.";
+  }
+});
 
 const locations = [ {name: "town square" ,
    'button text': ["Go to store", "Go to cave", "Fight dragon"],
