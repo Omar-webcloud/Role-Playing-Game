@@ -58,7 +58,7 @@ async function saveGameData() {
     // For GitHub Pages deployment - use environment-aware URL
     const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
       ? 'http://localhost:3000/api/save-game'
-      : 'https://dragon-repeller-server.vercel.app/api/save-game';
+      : 'https://rpg-backend-puce.vercel.app/api/save-game';
     
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -85,7 +85,7 @@ async function loadGameData(uid) {
     // For GitHub Pages deployment - use environment-aware URL
     const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
       ? `http://localhost:3000/api/game-data/${uid}`
-      : `https://dragon-repeller-server.vercel.app/api/game-data/${uid}`;
+      : `https://rpg-backend-puce.vercel.app/api/game-data/${uid}`;
     
     const response = await fetch(apiUrl);
     const data = await response.json();
@@ -129,8 +129,7 @@ saveButton.addEventListener('click', () => {
 const locations = [ {name: "town square" ,
    'button text': ["Go to store", "Go to cave", "Fight dragon"],
     "button functions":[goStore, goCave, fightDragon],
-  'text':"You are in the town square. You see a sign that says \"Store\"."},
-  {name: "store", "button text": ["Buy 10 health (10 gold)", "Buy weapon (30 gold)", "Go to town square"], 
+  'text':"You are in the town square. You see a sign that says \"Store\"."},{name: "store", "button text": ["Buy 10 health (10 gold)", "Buy weapon (30 gold)", "Go to town square"], 
   "button functions":[buyHealth, buyWeapon, goTown],
   'text':"You enter the store."
   },
@@ -145,8 +144,6 @@ const locations = [ {name: "town square" ,
 
   },
  ]
-
-
 
 
 
