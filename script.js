@@ -2246,3 +2246,701 @@ function startGame(){
 }
 
 startGame();
+
+// =====================================
+// PART 4
+// ENDGAME SYSTEMS
+// =====================================
+
+// =====================================
+// DAY NIGHT CYCLE
+// =====================================
+
+let worldTime = 0;
+
+function updateWorldTime(){
+
+    worldTime++;
+
+    if(worldTime > 2400){
+
+        worldTime = 0;
+
+    }
+
+}
+
+setInterval(
+    updateWorldTime,
+    1000
+);
+
+function isNight(){
+
+    return (
+        worldTime > 1200
+    );
+
+}
+
+// =====================================
+// SKY COLORS
+// =====================================
+
+function drawDynamicSky(){
+
+    if(isNight()){
+
+        rect(
+            0,
+            0,
+            640,
+            160,
+            "#101c3d"
+        );
+
+    }else{
+
+        rect(
+            0,
+            0,
+            640,
+            160,
+            "#5fa9ff"
+        );
+
+    }
+
+}
+
+// =====================================
+// PLAYER SKILLS
+// =====================================
+
+const skillTree = {
+
+    strength:0,
+
+    vitality:0,
+
+    agility:0,
+
+    magic:0
+
+};
+
+function spendSkillPoint(skill){
+
+    if(
+        PLAYER.skillPoints <= 0
+    ){
+
+        addLog(
+            "No skill points."
+        );
+
+        return;
+    }
+
+    PLAYER.skillPoints--;
+
+    skillTree[skill]++;
+
+    applySkillEffects();
+
+}
+
+function applySkillEffects(){
+
+    PLAYER.maxHp =
+        100 +
+        (
+            skillTree.vitality * 20
+        );
+
+    PLAYER.defense =
+        getArmor().defense +
+        (
+            skillTree.strength * 2
+        );
+
+    if(
+        PLAYER.hp >
+        PLAYER.maxHp
+    ){
+
+        PLAYER.hp =
+            PLAYER.maxHp;
+
+    }
+
+    renderStats();
+
+}
+
+// =====================================
+// SKILL DAMAGE BONUS
+// =====================================
+
+function getSkillBonus(){
+
+    return (
+        skillTree.strength * 3
+    );
+
+}
+
+// =====================================
+// PATCH ATTACK
+// =====================================
+
+const originalAttack =
+    attack;
+
+attack = function(){
+
+    const weapon =
+        getWeapon();
+
+    let damage =
+        weapon.power +
+        getSkillBonus() +
+        Math.floor(
+            Math.random()*10
+        );
+
+    if(
+        Math.random() <
+        (
+            0.15 +
+            skillTree.agility *
+            0.02
+        )
+    ){
+
+        damage *= 2;
+
+        addLog(
+            "Critical!"
+        );
+
+    }
+
+    monsterCurrentHp -=
+        damage;
+
+    addLog(
+        `${damage} damage`
+    );
+
+    updateMonsterBar();
+
+    if(
+        monsterCurrentHp <= 0
+    ){
+
+        defeatMonster();
+
+        return;
+    }
+
+    monsterAttack();
+
+};
+
+// =====================================
+// ACHIEVEMENTS
+// =====================================
+
+const achievements = {
+
+    firstKill:false,
+
+    level10:false,
+
+    dragonSlayer:false,
+
+    rich:false
+
+};
+
+function unlockAchievement(name){
+
+    if(
+        achievements[name]
+    ) return;
+
+    achievements[name] =
+        true;
+
+    addLog(
+        `Achievement:
+        ${name}`
+    );
+
+}
+
+function checkAchievements(){
+
+    if(
+        PLAYER.level >= 10
+    ){
+
+        unlockAchievement(
+            "level10"
+        );
+
+    }
+
+    if(
+        PLAYER.gold >= 1000
+    ){
+
+        unlockAchievement(
+            "rich"
+        );
+
+    }
+
+}
+
+// =====================================
+// PATCH MONSTER WIN
+// =====================================
+
+const oldDefeat =
+    defeatMonster;
+
+defeatMonster = function(){
+
+    unlockAchievement(
+        "firstKill"
+    );
+
+    if(
+        currentMonster.id ===
+        "dragon"
+    ){
+
+        unlockAchievement(
+            "dragonSlayer"
+        );
+
+    }
+
+    oldDefeat();
+
+    checkAchievements();
+
+};
+
+// =====================================
+// ELITE MONSTERS
+// =====================================
+
+const eliteMonsters = [
+
+{
+    id:"shadowlord",
+
+    name:"Shadow Lord",
+
+    hp:1000,
+
+    level:40,
+
+    gold:2000,
+
+    xp:1000
+
+},
+
+{
+    id:"ancientdragon",
+
+    name:"Ancient Dragon",
+
+    hp:2000,
+
+    level:60,
+
+    gold:5000,
+
+    xp:2500
+
+}
+
+];
+
+// =====================================
+// ELITE BOSS FIGHT
+// =====================================
+
+function fightShadowLord(){
+
+    currentMonster =
+        eliteMonsters[0];
+
+    monsterCurrentHp =
+        currentMonster.hp;
+
+    startBossFight();
+
+}
+
+function fightAncientDragon(){
+
+    currentMonster =
+        eliteMonsters[1];
+
+    monsterCurrentHp =
+        currentMonster.hp;
+
+    startBossFight();
+
+}
+
+function startBossFight(){
+
+    monsterStats.style.display =
+        "block";
+
+    monsterName.textContent =
+        currentMonster.name;
+
+    monsterLevel.textContent =
+        `Boss Lv
+        ${currentMonster.level}`;
+
+    updateMonsterBar();
+
+    button1.onclick =
+        attack;
+
+    button2.onclick =
+        blockAttack;
+
+    button3.onclick =
+        dodgeAttack;
+
+}
+
+// =====================================
+// DYNAMIC SHOP
+// =====================================
+
+let shopInventory = [];
+
+function generateShopInventory(){
+
+    shopInventory = [];
+
+    weapons.forEach(
+        weapon=>{
+
+        if(
+            Math.random() > .4
+        ){
+
+            shopInventory.push(
+                weapon
+            );
+
+        }
+
+    });
+
+}
+
+generateShopInventory();
+
+setInterval(
+
+    generateShopInventory,
+
+    600000
+
+);
+
+// =====================================
+// CRAFTING
+// =====================================
+
+const craftingRecipes = [
+
+{
+    result:"battleaxe",
+
+    materials:[
+        "bow",
+        "dagger"
+    ]
+},
+
+{
+    result:"sword",
+
+    materials:[
+        "axe",
+        "staff"
+    ]
+}
+
+];
+
+function craft(recipeId){
+
+    const recipe =
+        craftingRecipes[
+            recipeId
+        ];
+
+    const hasItems =
+        recipe.materials.every(
+
+            item=>
+
+            inventory.weapons.includes(
+                item
+            )
+
+        );
+
+    if(!hasItems){
+
+        addLog(
+            "Missing materials."
+        );
+
+        return;
+    }
+
+    recipe.materials.forEach(
+        item=>{
+
+        const index =
+            inventory.weapons.indexOf(
+                item
+            );
+
+        inventory.weapons.splice(
+            index,
+            1
+        );
+
+    });
+
+    inventory.weapons.push(
+        recipe.result
+    );
+
+    renderInventory();
+
+    addLog(
+        "Craft successful."
+    );
+
+}
+
+// =====================================
+// RARE LOOT TABLE
+// =====================================
+
+function rollRareLoot(){
+
+    const roll =
+        Math.random();
+
+    if(
+        roll < 0.02
+    ){
+
+        inventory.weapons.push(
+            "sword"
+        );
+
+        addLog(
+            "Legendary Sword!"
+        );
+
+    }
+
+    if(
+        roll < 0.01
+    ){
+
+        inventory.armor.push(
+            "steel"
+        );
+
+        addLog(
+            "Steel Armor!"
+        );
+
+    }
+
+}
+
+// =====================================
+// PATCH DEFEAT MONSTER
+// =====================================
+
+const previousVictory =
+    defeatMonster;
+
+defeatMonster = function(){
+
+    rollRareLoot();
+
+    previousVictory();
+
+};
+
+// =====================================
+// RANDOM ENCOUNTERS
+// =====================================
+
+function randomEncounter(){
+
+    if(
+        currentLocation !==
+        "forest"
+    ) return;
+
+    if(
+        Math.random() < .15
+    ){
+
+        startFight(
+            Math.random() > .5
+            ? "wolf"
+            : "goblin"
+        );
+
+    }
+
+}
+
+setInterval(
+
+    randomEncounter,
+
+    30000
+
+);
+
+// =====================================
+// SAVE EXTENSIONS
+// =====================================
+
+const oldBuildSave =
+    buildSaveData;
+
+buildSaveData =
+function(){
+
+    const save =
+        oldBuildSave();
+
+    save.skillTree =
+        skillTree;
+
+    save.achievements =
+        achievements;
+
+    save.worldTime =
+        worldTime;
+
+    return save;
+
+};
+
+// =====================================
+// PATCH LOAD
+// =====================================
+
+const oldLoadLocal =
+    loadLocal;
+
+loadLocal = function(){
+
+    oldLoadLocal();
+
+    const raw =
+        localStorage.getItem(
+            "pixel-rpg-save"
+        );
+
+    if(!raw) return;
+
+    const data =
+        JSON.parse(raw);
+
+    if(data.skillTree){
+
+        Object.assign(
+            skillTree,
+            data.skillTree
+        );
+
+    }
+
+    if(data.achievements){
+
+        Object.assign(
+            achievements,
+            data.achievements
+        );
+
+    }
+
+    if(data.worldTime){
+
+        worldTime =
+            data.worldTime;
+
+    }
+
+};
+
+// =====================================
+// ENDGAME CONTENT
+// =====================================
+
+function unlockEndgame(){
+
+    if(
+        !achievements.dragonSlayer
+    ) return;
+
+    button1.textContent =
+        "Shadow Lord";
+
+    button2.textContent =
+        "Ancient Dragon";
+
+    button3.textContent =
+        "Town";
+
+    button1.onclick =
+        fightShadowLord;
+
+    button2.onclick =
+        fightAncientDragon;
+
+    button3.onclick =
+        goTown;
+
+}
+
+// =====================================
+// PERIODIC CHECK
+// =====================================
+
+setInterval(
+
+    unlockEndgame,
+
+    3000
+
+);

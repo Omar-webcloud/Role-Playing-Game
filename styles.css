@@ -735,3 +735,217 @@ header {
     flex-direction: column;
   }
 }
+
+
+
+
+/* =====================================
+   MOBILE RESPONSIVE
+===================================== */
+
+@media screen and (max-width: 1024px) {
+
+  #game {
+      width: 100%;
+      margin: 0;
+      border: none;
+  }
+
+  #main-layout {
+      grid-template-columns: 1fr;
+  }
+
+  #right-panel {
+      flex-direction: row;
+      overflow-x: auto;
+  }
+
+  .panel {
+      min-width: 280px;
+  }
+
+  #sceneCanvas {
+      width: 100%;
+      height: auto;
+  }
+
+}
+
+@media screen and (max-width: 768px) {
+
+  body {
+      font-size: 12px;
+  }
+
+  #game {
+      max-width: 100%;
+  }
+
+  #stats {
+      padding: 12px;
+  }
+
+  .stat-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+  }
+
+  .stat-card {
+      padding: 10px;
+  }
+
+  .stat-card strong {
+      font-size: 14px;
+  }
+
+  .equipment-panel {
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+  }
+
+  #scene-wrapper {
+      padding: 10px;
+  }
+
+  #sceneCanvas {
+      width: 100%;
+      height: auto;
+      border-width: 2px;
+  }
+
+  #monsterStats {
+      margin: 10px;
+  }
+
+  #main-layout {
+      padding: 10px;
+      gap: 10px;
+  }
+
+  #left-panel {
+      min-height: auto;
+  }
+
+  #text {
+      min-height: 120px;
+      font-size: 11px;
+      line-height: 1.6;
+      padding: 12px;
+  }
+
+  #combat-log {
+      min-height: 120px;
+      max-height: 180px;
+      font-size: 10px;
+  }
+
+  #right-panel {
+      flex-direction: column;
+  }
+
+  .panel {
+      min-width: auto;
+      padding: 12px;
+  }
+
+  .panel h3 {
+      font-size: 11px;
+  }
+
+  #inventoryList,
+  #equipmentList,
+  #questList {
+      font-size: 10px;
+  }
+
+  .inventory-item,
+  .equipment-item,
+  .quest-item {
+      padding: 8px;
+  }
+
+  #controls {
+      grid-template-columns: 1fr;
+      padding: 10px;
+      gap: 10px;
+  }
+
+  .action-btn {
+      width: 100%;
+      min-height: 56px;
+      font-size: 12px;
+  }
+
+  .save-btn {
+      min-height: 50px;
+      font-size: 12px;
+  }
+
+}
+
+@media screen and (max-width: 480px) {
+
+  .stat-grid {
+      grid-template-columns: 1fr 1fr;
+  }
+
+  .stat-card {
+      padding: 8px;
+  }
+
+  .stat-card span {
+      font-size: 8px;
+  }
+
+  .stat-card strong {
+      font-size: 12px;
+  }
+
+  #location-badge {
+      padding: 10px;
+      text-align: center;
+  }
+
+  #locationName {
+      font-size: 12px;
+  }
+
+  #sceneCanvas {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+  }
+
+  .bar-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+  }
+
+  .bar-track {
+      width: 100%;
+  }
+
+  #healthText,
+  #xpProgressText {
+      font-size: 10px;
+  }
+
+  #text {
+      font-size: 10px;
+  }
+
+  .action-btn {
+      font-size: 11px;
+      min-height: 52px;
+  }
+
+  #inventoryList,
+  #equipmentList,
+  #questList {
+      max-height: 200px;
+      overflow-y: auto;
+  }
+
+}
