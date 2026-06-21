@@ -69,22 +69,70 @@
 
     <div id="game" style="display: none;">
         <div id="stats">
-            <span class="stat">XP: <strong><span id="xpText">0</span></strong></span>
-            <span class="stat">Health: <strong><span id="healthText">100</span></strong></span>
-            <span class="stat">Gold: <strong><span id="goldText">50</span></strong></span>
+            <div class="stat-group">
+                <div class="stat-badge">
+                    <span class="stat-label">Level</span>
+                    <strong id="levelText">1</strong>
+                </div>
+                <div class="stat-badge">
+                    <span class="stat-label">XP</span>
+                    <strong id="xpText">0</strong>
+                </div>
+                <div class="stat-badge gold">
+                    <span class="stat-label">Gold</span>
+                    <strong id="goldText">50</strong>
+                </div>
+            </div>
+            <div class="stat-bars">
+                <div class="bar-row">
+                    <span class="bar-label">HP</span>
+                    <div class="bar-track">
+                        <div id="healthBar" class="bar-fill health-fill"></div>
+                    </div>
+                    <span id="healthText" class="bar-value">100 / 100</span>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label">XP</span>
+                    <div class="bar-track">
+                        <div id="xpBar" class="bar-fill xp-fill"></div>
+                    </div>
+                    <span id="xpProgressText" class="bar-value">0 / 10</span>
+                </div>
+            </div>
+            <div class="weapon-row">
+                <span class="weapon-label">Equipped</span>
+                <strong id="weaponText">stick</strong>
+            </div>
             <button id="save-button" class="save-btn">Save Game</button>
         </div>
-        <div id="controls">
-            <button id="button1">Go to store</button>
-            <button id="button2">Go to cave</button>
-            <button id="button3">Fight dragon</button>
+
+        <div id="location-badge">
+            <span id="locationName">Town Square</span>
         </div>
+
         <div id="monsterStats">
-            <span class="stat">Monster Name: <strong><span id="monsterName"></span></strong></span>
-            <span class="stat">Health: <strong><span id="monsterHealth"></span></strong></span>
+            <div class="monster-header">
+                <span id="monsterName"></span>
+                <span id="monsterLevel" class="monster-level"></span>
+            </div>
+            <div class="bar-row monster-bar">
+                <div class="bar-track">
+                    <div id="monsterHealthBar" class="bar-fill monster-fill"></div>
+                </div>
+                <span id="monsterHealth" class="bar-value"></span>
+            </div>
         </div>
+
         <div id="text">
-            Welcome to Dragon Repeller. You must defeat the dragon that is preventing people from leaving the town. You are in the town square. Where do you want to go? Use the buttons above.
+            Welcome to Dragon Repeller. You must defeat the dragon that is preventing people from leaving the town. You are in the town square. Where do you want to go?
+        </div>
+
+        <div id="combat-log" aria-live="polite"></div>
+
+        <div id="controls">
+            <button id="button1" class="action-btn">Go to store</button>
+            <button id="button2" class="action-btn">Go to cave</button>
+            <button id="button3" class="action-btn">Fight dragon</button>
         </div>
     </div>
 
