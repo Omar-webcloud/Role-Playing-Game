@@ -1,16 +1,95 @@
-# Dragon Repeller RPG with Firebase Authentication and MongoDB
+# Pixel RPG Adventure
 
-This is a role-playing game with user authentication using Firebase and game data storage using MongoDB.
+A browser-based pixel-style role-playing game featuring authentication, persistent cloud saves, quests, equipment, crafting, boss battles, and RPG progression. User accounts are managed with Firebase Authentication, while game progress is stored in MongoDB.
 
-## Setup Instructions
+## Features
 
-### 1. Firebase Setup
+### Authentication
 
-1. Go to [Firebase Console](https://console.firebase.google.com/) and create a new project
-2. Add a web app to your project
-3. Enable Email/Password authentication in the Authentication section
-4. Copy your Firebase configuration from Project Settings
-5. Open `firebase-config.js` and replace the placeholder values with your actual Firebase configuration
+* User registration and login
+* Secure Firebase Authentication
+* Persistent player profiles
+* Automatic session management
+
+### RPG Gameplay
+
+* Multiple locations including Town, Forest, Dungeon, Temple, Inn, and Blacksmith
+* Character leveling system
+* Experience and progression mechanics
+* Gold economy
+* Inventory management
+* Equipment and armor system
+* Weapon upgrades
+* Quests and rewards
+* Crafting system
+* Boss battles
+* Achievement system
+* Skill tree progression
+* Auto-save and cloud-save support
+
+### Pixel RPG Experience
+
+* Pixel-art inspired visuals
+* Animated monsters
+* Dynamic environments
+* Day and night cycle
+* Responsive design for desktop and mobile devices
+
+## Technology Stack
+
+### Frontend
+
+* HTML5
+* CSS3
+* Vanilla JavaScript
+* Canvas API
+
+### Authentication
+
+* Firebase Authentication
+
+### Backend
+
+* Node.js
+* Express.js
+
+### Database
+
+* MongoDB Atlas
+
+## Project Structure
+
+```text
+project-root/
+│
+├── index.html
+├── styles.css
+├── script.js
+├── firebase-config.js
+│
+├── server/
+│   ├── server.js
+│   ├── routes/
+│   ├── models/
+│   └── middleware/
+│
+├── .env
+├── package.json
+└── README.md
+```
+
+## Firebase Setup
+
+### Create a Firebase Project
+
+1. Visit Firebase Console
+2. Create a new project
+3. Add a Web Application
+4. Enable Email/Password Authentication
+
+### Configure Firebase
+
+Open `firebase-config.js` and replace the placeholders:
 
 ```javascript
 const firebaseConfig = {
@@ -23,83 +102,175 @@ const firebaseConfig = {
 };
 ```
 
-### 2. MongoDB Setup
+## MongoDB Setup
 
-1. Create a free MongoDB Atlas account at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. Create a new cluster (the free tier is sufficient)
-3. Set up a database user with password
-4. Get your connection string from MongoDB Atlas
-5. Open the `.env` file and replace the placeholder MongoDB URI with your actual connection string
+### Create a MongoDB Atlas Cluster
 
+1. Create a MongoDB Atlas account
+2. Create a cluster
+3. Create a database user
+4. Whitelist your IP address
+5. Copy your connection string
+
+### Configure Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/pixel-rpg?retryWrites=true&w=majority
+
+PORT=3000
 ```
-MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/dragon-repeller?retryWrites=true&w=majority
+
+## Installation
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/pixel-rpg-adventure.git
+
+cd pixel-rpg-adventure
 ```
 
-### 3. Install Dependencies and Run the Server
+### Install Dependencies
 
-1. Install Node.js if you haven't already
-2. Open a terminal in the project directory
-3. Install dependencies:
-
-```
+```bash
 npm install
 ```
 
-4. Start the server:
+### Start Development Server
 
-```
+```bash
 npm start
 ```
 
-## Deploying to GitHub Pages
+The application will be available at:
 
-To deploy this game to GitHub Pages, you'll need to make a few adjustments since GitHub Pages only supports static content:
-
-### 1. Deploy the Backend
-
-First, deploy your Node.js backend to a service that supports server-side code:
-
-- [Vercel](https://vercel.com/)
-- [Netlify](https://www.netlify.com/) with Netlify Functions
-- [Heroku](https://www.heroku.com/)
-- [Firebase Cloud Functions](https://firebase.google.com/docs/functions)
-
-### 2. Update API URLs
-
-After deploying your backend, update the API URLs in `script.js`:
-
-1. Find the `saveGameData` and `loadGameData` functions
-2. Replace `https://your-deployed-backend-url.com` with your actual deployed backend URL
-
-### 3. Deploy to GitHub Pages
-
-1. Push your code to a GitHub repository
-2. Go to repository Settings > Pages
-3. Select your main branch as the source
-4. Click Save
-
-Your game will be available at `https://yourusername.github.io/repository-name/`
+```text
+http://localhost:3000
 ```
 
-5. Open your browser and navigate to `http://localhost:3000`
+## Saving Progress
 
-## Features
+Player data is automatically saved every 30 seconds.
 
-- User authentication (signup, login, logout)
-- Game progress automatically saved to MongoDB
-- Manual save option with save button
-- Game state persists between sessions
+Saved data includes:
 
-## Game Instructions
+* Character level
+* Experience points
+* Gold
+* Health
+* Inventory
+* Weapons
+* Armor
+* Equipment
+* Quests
+* Achievements
+* Skill tree progress
+* World progression
 
-1. Sign up or log in to start playing
-2. Navigate through the game using the buttons
-3. Your progress is automatically saved every 30 seconds
-4. You can manually save your progress using the Save Game button
+Players can also manually save using the Save Game button.
 
-## Technologies Used
+## Gameplay Guide
 
-- HTML, CSS, JavaScript
-- Firebase Authentication
-- MongoDB for data storage
-- Express.js for the server
+### Starting Your Adventure
+
+1. Create an account or sign in
+2. Enter Town Square
+3. Accept quests at the Temple
+4. Explore the Forest and Dungeon
+5. Defeat monsters to earn XP and gold
+6. Upgrade equipment at the Blacksmith
+7. Purchase supplies from the Store
+8. Rest at the Inn when needed
+9. Defeat bosses to unlock endgame content
+
+### Character Progression
+
+Players can improve:
+
+* Strength
+* Vitality
+* Agility
+* Magic
+
+Skill points are earned through leveling up.
+
+### Equipment
+
+Available weapon types include:
+
+* Stick
+* Dagger
+* Bow
+* Staff
+* Battle Axe
+* Sword
+
+Armor progression includes:
+
+* Cloth Armor
+* Leather Armor
+* Chainmail
+* Steel Armor
+
+## Deployment
+
+### Backend Deployment
+
+Deploy the Node.js backend to a platform that supports server-side applications:
+
+* Vercel
+* Railway
+* Render
+* Firebase Functions
+* Heroku
+
+### Update API Endpoints
+
+After deployment, replace local API URLs with your production backend URL.
+
+Example:
+
+```javascript
+https://your-backend-domain.com/api/save-game
+```
+
+### Frontend Deployment
+
+Deploy the frontend to GitHub Pages:
+
+1. Push your code to GitHub
+2. Open Repository Settings
+3. Navigate to Pages
+4. Select the main branch
+5. Save changes
+
+Your game will be available at:
+
+```text
+https://yourusername.github.io/pixel-rpg-adventure
+```
+
+## Future Roadmap
+
+* Real pixel-art sprite sheets
+* Sound effects and background music
+* Additional classes and skill trees
+* Crafting expansion
+* Trading system
+* Guild system
+* PvP Arena
+* Multiplayer support
+* Seasonal events
+* Additional endgame bosses
+
+## License
+
+This project is available for personal and educational use.
+
+## Credits
+
+UI and Game Design: Fariha Munir
+
+Development: Md. Omar Faruk Chowdhury
