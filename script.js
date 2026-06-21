@@ -1,501 +1,2248 @@
-// Game state
-let xp = 0;
-let health = 100;
-let gold = 50;
-let currentWeaponIndex = 0;
-let fighting;
-let monsterHealth;
-let monsterMaxHealth;
-let inventory = ["stick"];
-let currentUser = null;
-let specialAttackReady = true;
-let currentLocation = 0;
+// =====================================
+// PIXEL RPG ENGINE V2
+// PART 1
+// =====================================
 
-const XP_PER_LEVEL = 10;
-const BASE_HEALTH = 100;
-const HEALTH_PER_LEVEL = 15;
+// ---------- DOM ----------
 
 const button1 = document.querySelector("#button1");
 const button2 = document.querySelector("#button2");
 const button3 = document.querySelector("#button3");
+
 const saveButton = document.querySelector("#save-button");
+
 const text = document.querySelector("#text");
+
 const xpText = document.querySelector("#xpText");
-const healthText = document.querySelector("#healthText");
 const goldText = document.querySelector("#goldText");
 const levelText = document.querySelector("#levelText");
-const weaponText = document.querySelector("#weaponText");
+
+const healthText = document.querySelector("#healthText");
+const xpProgressText = document.querySelector("#xpProgressText");
+
 const healthBar = document.querySelector("#healthBar");
 const xpBar = document.querySelector("#xpBar");
-const xpProgressText = document.querySelector("#xpProgressText");
-const monsterName = document.querySelector("#monsterName");
+
+const defenseText = document.querySelector("#defenseText");
+
+const weaponText = document.querySelector("#weaponText");
+const armorText = document.querySelector("#armorText");
+
+const inventoryList = document.querySelector("#inventoryList");
+const equipmentList = document.querySelector("#equipmentList");
+const questList = document.querySelector("#questList");
+
 const monsterStats = document.querySelector("#monsterStats");
-const monsterHealthText = document.querySelector("#monsterHealth");
-const monsterHealthBar = document.querySelector("#monsterHealthBar");
+const monsterName = document.querySelector("#monsterName");
 const monsterLevel = document.querySelector("#monsterLevel");
+const monsterHealth = document.querySelector("#monsterHealth");
+const monsterHealthBar = document.querySelector("#monsterHealthBar");
+
 const locationName = document.querySelector("#locationName");
+
 const combatLog = document.querySelector("#combat-log");
-const gameContainer = document.querySelector("#game");
+
+const canvas = document.querySelector("#sceneCanvas");
+const ctx = canvas.getContext("2d");
+
+ctx.imageSmoothingEnabled = false;
+
+// =====================================
+// GAME DATA
+// =====================================
+
+const GAME_VERSION = "2.0";
+
+const XP_PER_LEVEL = 20;
+
+const PLAYER = {
+    level: 1,
+    xp: 0,
+    hp: 100,
+    maxHp: 100,
+    gold: 50,
+    defense: 0,
+    skillPoints: 0
+};
+
+// =====================================
+// WEAPONS
+// =====================================
 
 const weapons = [
-  { name: "stick", power: 5 },
-  { name: "dagger", power: 30 },
-  { name: "claw hammer", power: 50 },
-  { name: "sword", power: 100 }
+
+{
+    id:"stick",
+    name:"Stick",
+    power:5,
+    price:0,
+    rarity:"Common",
+    type:"Melee"
+},
+
+{
+    id:"dagger",
+    name:"Dagger",
+    power:15,
+    price:30,
+    rarity:"Common",
+    type:"Melee"
+},
+
+{
+    id:"bow",
+    name:"Hunter Bow",
+    power:28,
+    price:60,
+    rarity:"Rare",
+    type:"Ranged"
+},
+
+{
+    id:"staff",
+    name:"Mage Staff",
+    power:35,
+    price:90,
+    rarity:"Rare",
+    type:"Magic"
+},
+
+{
+    id:"axe",
+    name:"Battle Axe",
+    power:55,
+    price:140,
+    rarity:"Epic",
+    type:"Melee"
+},
+
+{
+    id:"sword",
+    name:"Knight Sword",
+    power:85,
+    price:250,
+    rarity:"Legendary",
+    type:"Melee"
+}
+
 ];
+
+// =====================================
+// ARMOR
+// =====================================
+
+const armors = [
+
+{
+    id:"cloth",
+    name:"Cloth Armor",
+    defense:0,
+    price:0
+},
+
+{
+    id:"leather",
+    name:"Leather Armor",
+    defense:5,
+    price:50
+},
+
+{
+    id:"chain",
+    name:"Chainmail",
+    defense:10,
+    price:100
+},
+
+{
+    id:"steel",
+    name:"Steel Armor",
+    defense:20,
+    price:250
+}
+
+];
+
+// =====================================
+// MONSTERS
+// =====================================
 
 const monsters = [
-  { name: "slime", level: 2, health: 15 },
-  { name: "fanged beast", level: 8, health: 60 },
-  { name: "dragon", level: 20, health: 300 }
+
+{
+    id:"slime",
+    name:"Slime",
+    level:2,
+    hp:20,
+    gold:10,
+    xp:5
+},
+
+{
+    id:"wolf",
+    name:"Wolf",
+    level:4,
+    hp:40,
+    gold:20,
+    xp:10
+},
+
+{
+    id:"goblin",
+    name:"Goblin",
+    level:6,
+    hp:60,
+    gold:35,
+    xp:15
+},
+
+{
+    id:"skeleton",
+    name:"Skeleton",
+    level:10,
+    hp:100,
+    gold:60,
+    xp:25
+},
+
+{
+    id:"troll",
+    name:"Troll",
+    level:15,
+    hp:180,
+    gold:120,
+    xp:50
+},
+
+{
+    id:"dragon",
+    name:"Dragon",
+    level:25,
+    hp:500,
+    gold:500,
+    xp:200
+}
+
 ];
 
-const locations = [
-  {
-    name: "town square",
-    displayName: "Town Square",
-    "button text": ["Go to store", "Go to cave", "Fight dragon"],
-    "button functions": [goStore, goCave, fightDragon],
-    text: "You stand in the bustling town square. Merchants call out from the store, and a dark cave mouth yawns in the distance. The dragon's shadow looms over everything."
-  },
-  {
-    name: "store",
-    displayName: "Store",
-    "button text": ["Buy health (10g)", "Buy weapon (30g)", "Leave store"],
-    "button functions": [buyHealth, buyWeapon, goTown],
-    text: "The storekeeper greets you warmly. Potions and weapons line the shelves."
-  },
-  {
-    name: "cave",
-    displayName: "Cave",
-    "button text": ["Fight slime", "Fight beast", "Leave cave"],
-    "button functions": [fightSlime, fightBeast, goTown],
-    text: "Damp air fills the cave. You hear creatures stirring in the darkness."
-  },
-  {
-    name: "fight",
-    displayName: "Combat",
-    "button text": ["Attack", "Power Strike", "Run"],
-    "button functions": [attack, specialAttack, goTown],
-    text: "A monster blocks your path. Choose your action!"
-  },
-  {
-    name: "kill monster",
-    displayName: "Victory",
-    "button text": ["Return to town", "Return to town", "Secret game?"],
-    "button functions": [goTown, goTown, easterEgg],
-    text: "The monster falls with a final cry. You gain experience and loot its body."
-  },
-  {
-    name: "lose",
-    displayName: "Defeat",
-    "button text": ["Try again", "Try again", "Try again"],
-    "button functions": [restart, restart, restart],
-    text: "You collapse to the ground. The world fades to black. &#x2620;"
-  },
-  {
-    name: "win",
-    displayName: "Victory!",
-    "button text": ["Play again", "Play again", "Play again"],
-    "button functions": [restart, restart, restart],
-    text: "The dragon crashes to the earth! The town is free at last. YOU WIN! &#x1F389;"
-  },
-  {
-    name: "easter egg",
-    displayName: "Secret Game",
-    "button text": ["Pick 2", "Pick 8", "Leave"],
-    "button functions": [pickTwo, pickEight, goTown],
-    text: "You discover a hidden gambling den. Pick a number — ten random numbers (0–10) will be drawn. Match yours to win 20 gold!"
-  }
+// =====================================
+// PLAYER INVENTORY
+// =====================================
+
+const inventory = {
+
+    weapons:["stick"],
+
+    armor:["cloth"],
+
+    consumables:[
+        {
+            name:"Health Potion",
+            amount:2
+        }
+    ]
+
+};
+
+// =====================================
+// EQUIPPED ITEMS
+// =====================================
+
+const equipment = {
+
+    weapon:"stick",
+
+    armor:"cloth"
+
+};
+
+// =====================================
+// QUEST SYSTEM
+// =====================================
+
+const questDatabase = [
+
+{
+    id:1,
+    title:"Wolf Hunter",
+    description:"Defeat 3 wolves",
+    target:"wolf",
+    required:3,
+    rewardGold:100,
+    rewardXp:30
+},
+
+{
+    id:2,
+    title:"Goblin Menace",
+    description:"Defeat 5 goblins",
+    target:"goblin",
+    required:5,
+    rewardGold:150,
+    rewardXp:50
+},
+
+{
+    id:3,
+    title:"Skeleton Purge",
+    description:"Defeat 4 skeletons",
+    target:"skeleton",
+    required:4,
+    rewardGold:250,
+    rewardXp:100
+}
+
 ];
 
-// --- Level & stats helpers ---
+let activeQuests = [];
 
-function getLevel() {
-  return Math.floor(xp / XP_PER_LEVEL) + 1;
+// =====================================
+// COMBAT STATE
+// =====================================
+
+let currentMonster = null;
+let monsterCurrentHp = 0;
+
+let specialReady = true;
+
+let currentLocation = "town";
+
+// =====================================
+// LOCATION DATA
+// =====================================
+
+const locations = {
+
+town:{
+    name:"Town Square",
+    buttons:[
+        "Store",
+        "Forest",
+        "Dungeon"
+    ]
+},
+
+store:{
+    name:"General Store",
+    buttons:[
+        "Buy Potion",
+        "Blacksmith",
+        "Town"
+    ]
+},
+
+forest:{
+    name:"Forest",
+    buttons:[
+        "Fight Wolf",
+        "Fight Goblin",
+        "Town"
+    ]
+},
+
+dungeon:{
+    name:"Dungeon",
+    buttons:[
+        "Fight Skeleton",
+        "Fight Troll",
+        "Town"
+    ]
+},
+
+inn:{
+    name:"Traveler Inn",
+    buttons:[
+        "Rest",
+        "Temple",
+        "Town"
+    ]
+},
+
+blacksmith:{
+    name:"Blacksmith",
+    buttons:[
+        "Upgrade",
+        "Buy Armor",
+        "Town"
+    ]
 }
 
-function getMaxHealth() {
-  return BASE_HEALTH + (getLevel() - 1) * HEALTH_PER_LEVEL;
+};
+
+// =====================================
+// COMBAT LOG
+// =====================================
+
+function addLog(message){
+
+    const div = document.createElement("div");
+
+    div.className = "combat-entry";
+
+    div.textContent = message;
+
+    combatLog.prepend(div);
+
+    while(combatLog.children.length > 25){
+
+        combatLog.removeChild(
+            combatLog.lastChild
+        );
+
+    }
+
 }
 
-function getXpProgress() {
-  return xp % XP_PER_LEVEL;
+// =====================================
+// LEVEL SYSTEM
+// =====================================
+
+function getLevel(){
+
+    return PLAYER.level;
+
 }
 
-function getDamageBonus() {
-  return Math.floor(getLevel() / 2);
+function gainXp(amount){
+
+    PLAYER.xp += amount;
+
+    while(
+        PLAYER.xp >= PLAYER.level * XP_PER_LEVEL
+    ){
+
+        PLAYER.xp -= PLAYER.level * XP_PER_LEVEL;
+
+        PLAYER.level++;
+
+        PLAYER.maxHp += 20;
+
+        PLAYER.hp = PLAYER.maxHp;
+
+        PLAYER.skillPoints++;
+
+        addLog(
+            `Level Up! Level ${PLAYER.level}`
+        );
+
+    }
+
 }
 
-function refreshStats() {
-  const maxHp = getMaxHealth();
-  const level = getLevel();
-  const xpProg = getXpProgress();
+// =====================================
+// EQUIPMENT HELPERS
+// =====================================
 
-  levelText.innerText = level;
-  xpText.innerText = xp;
-  goldText.innerText = gold;
-  healthText.innerText = `${health} / ${maxHp}`;
-  weaponText.innerText = weapons[currentWeaponIndex].name;
-  xpProgressText.innerText = `${xpProg} / ${XP_PER_LEVEL}`;
+function getWeapon(){
 
-  healthBar.style.width = `${Math.max(0, (health / maxHp) * 100)}%`;
-  xpBar.style.width = `${(xpProg / XP_PER_LEVEL) * 100}%`;
+    return weapons.find(
+        w => w.id === equipment.weapon
+    );
+
 }
 
-function addCombatLog(message, type = "") {
-  combatLog.classList.add("active");
-  const entry = document.createElement("div");
-  entry.className = `combat-entry ${type}`;
-  entry.textContent = message;
-  combatLog.prepend(entry);
+function getArmor(){
 
-  while (combatLog.children.length > 8) {
-    combatLog.removeChild(combatLog.lastChild);
-  }
+    return armors.find(
+        a => a.id === equipment.armor
+    );
+
 }
 
-function clearCombatLog() {
-  combatLog.innerHTML = "";
-  combatLog.classList.remove("active");
+function updateDefense(){
+
+    PLAYER.defense =
+        getArmor().defense;
+
 }
 
-function flashGame(className) {
-  gameContainer.classList.remove("shake", "player-hit", "monster-hit");
-  void gameContainer.offsetWidth;
-  gameContainer.classList.add(className);
-  setTimeout(() => gameContainer.classList.remove(className), 400);
+// =====================================
+// UI RENDERING
+// =====================================
+
+function renderStats(){
+
+    updateDefense();
+
+    levelText.textContent =
+        PLAYER.level;
+
+    xpText.textContent =
+        PLAYER.xp;
+
+    goldText.textContent =
+        PLAYER.gold;
+
+    defenseText.textContent =
+        PLAYER.defense;
+
+    weaponText.textContent =
+        getWeapon().name;
+
+    armorText.textContent =
+        getArmor().name;
+
+    healthText.textContent =
+        `${PLAYER.hp}/${PLAYER.maxHp}`;
+
+    const xpNeeded =
+        PLAYER.level * XP_PER_LEVEL;
+
+    xpProgressText.textContent =
+        `${PLAYER.xp}/${xpNeeded}`;
+
+    healthBar.style.width =
+        `${(PLAYER.hp / PLAYER.maxHp)*100}%`;
+
+    xpBar.style.width =
+        `${(PLAYER.xp / xpNeeded)*100}%`;
+
 }
 
-function checkLevelUp(oldXp) {
-  const prevLevel = Math.floor(oldXp / XP_PER_LEVEL) + 1;
-  const newLevel = getLevel();
-  if (newLevel > prevLevel) {
-    const maxHp = getMaxHealth();
-    health = maxHp;
-    addCombatLog(`Level up! You are now level ${newLevel}. Max HP increased!`, "level-up");
-    text.innerHTML += `<br><br><strong style="color:#ffcc00">LEVEL UP!</strong> You reached level ${newLevel}. Your max health is now ${maxHp}.`;
-  }
-}
+// =====================================
+// INVENTORY RENDER
+// =====================================
 
-// --- Auth & save/load ---
+function renderInventory(){
 
-auth.onAuthStateChanged(user => {
-  if (user) {
-    currentUser = user;
-    loadGameData(user.uid);
-  } else {
-    currentUser = null;
-  }
-});
+    inventoryList.innerHTML = "";
 
-async function saveGameData() {
-  if (!currentUser) return;
+    inventory.weapons.forEach(id=>{
 
-  try {
-    const gameData = { xp, health, gold, inventory, currentWeaponIndex };
-    const apiUrl = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-      ? "http://localhost:3000/api/save-game"
-      : "https://rpg-backend-puce.vercel.app/api/save-game";
+        const item =
+            weapons.find(
+                w=>w.id===id
+            );
 
-    const response = await fetch(apiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ uid: currentUser.uid, gameData })
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "inventory-item";
+
+        div.textContent =
+            item.name;
+
+        inventoryList.appendChild(div);
+
     });
 
-    return await response.json();
-  } catch (error) {
-    console.error("Error saving game:", error);
-  }
 }
 
-async function loadGameData(uid) {
-  try {
-    const apiUrl = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-      ? `http://localhost:3000/api/game-data/${uid}`
-      : `https://rpg-backend-puce.vercel.app/api/game-data/${uid}`;
+// =====================================
+// EQUIPMENT PANEL
+// =====================================
 
-    const response = await fetch(apiUrl);
-    const data = await response.json();
+function renderEquipment(){
 
-    if (data.gameData) {
-      xp = data.gameData.xp;
-      health = data.gameData.health;
-      gold = data.gameData.gold;
-      inventory = data.gameData.inventory;
-      currentWeaponIndex = data.gameData.currentWeaponIndex;
-      updateLocation(locations[0]);
-    }
-  } catch (error) {
-    console.error("Error loading game data:", error);
-  }
+    equipmentList.innerHTML = "";
+
+    const weaponDiv =
+        document.createElement("div");
+
+    weaponDiv.className =
+        "equipment-item";
+
+    weaponDiv.textContent =
+        `Weapon: ${getWeapon().name}`;
+
+    equipmentList.appendChild(
+        weaponDiv
+    );
+
+    const armorDiv =
+        document.createElement("div");
+
+    armorDiv.className =
+        "equipment-item";
+
+    armorDiv.textContent =
+        `Armor: ${getArmor().name}`;
+
+    equipmentList.appendChild(
+        armorDiv
+    );
+
 }
 
-setInterval(() => {
-  if (currentUser) saveGameData();
-}, 30000);
+// =====================================
+// QUEST RENDER
+// =====================================
 
-saveButton.addEventListener("click", () => {
-  if (currentUser) {
-    saveGameData();
-    text.innerHTML = "Game saved successfully!";
-    setTimeout(() => updateLocation(locations[currentLocation]), 1500);
-  } else {
-    text.innerHTML = "You must be logged in to save your game.";
-  }
-});
+function renderQuests(){
 
-// --- Navigation ---
+    questList.innerHTML = "";
 
-button1.onclick = goStore;
-button2.onclick = goCave;
-button3.onclick = fightDragon;
+    activeQuests.forEach(quest=>{
 
-function updateLocation(location) {
-  currentLocation = locations.indexOf(location);
-  monsterStats.style.display = "none";
+        const div =
+            document.createElement("div");
 
-  if (location.name !== "fight") {
-    clearCombatLog();
-    specialAttackReady = true;
-  }
+        div.className =
+            "quest-item";
 
-  button1.innerText = location["button text"][0];
-  button2.innerText = location["button text"][1];
-  button3.innerText = location["button text"][2];
-  button1.onclick = location["button functions"][0];
-  button2.onclick = location["button functions"][1];
-  button3.onclick = location["button functions"][2];
+        div.innerHTML = `
+        <strong>${quest.title}</strong>
+        <br>
+        ${quest.progress}/${quest.required}
+        `;
 
-  button1.className = "action-btn";
-  button2.className = location.name === "fight" && specialAttackReady ? "action-btn special" : "action-btn";
-  button3.className = "action-btn";
-  button2.disabled = location.name === "fight" && !specialAttackReady;
+        questList.appendChild(div);
 
-  locationName.textContent = location.displayName || location.name;
-  text.innerHTML = location.text;
-  text.classList.remove("fade-in");
-  void text.offsetWidth;
-  text.classList.add("fade-in");
+    });
 
-  refreshStats();
 }
 
-function goTown() { updateLocation(locations[0]); }
-function goStore() { updateLocation(locations[1]); }
-function goCave() { updateLocation(locations[2]); }
+// =====================================
+// SAVE STRUCTURE
+// =====================================
 
-// --- Store ---
+function buildSaveData(){
 
-function buyHealth() {
-  if (gold >= 10) {
-    gold -= 10;
-    const maxHp = getMaxHealth();
-    health = Math.min(health + 20, maxHp);
-    addCombatLog("Purchased a health potion (+20 HP).", "heal");
-    text.innerHTML = "You drink a health potion and feel rejuvenated. <strong>+20 HP</strong>";
-    refreshStats();
-  } else {
-    text.innerHTML = "You don't have enough gold. You need 10 gold.";
-  }
+    return {
+
+        version:GAME_VERSION,
+
+        player:PLAYER,
+
+        inventory,
+
+        equipment,
+
+        activeQuests
+
+    };
+
 }
 
-function buyWeapon() {
-  if (currentWeaponIndex < weapons.length - 1) {
-    if (gold >= 30) {
-      gold -= 30;
-      currentWeaponIndex++;
-      const newWeapon = weapons[currentWeaponIndex].name;
-      inventory.push(newWeapon);
-      text.innerHTML = `You bought a <strong>${newWeapon}</strong>! Damage: ${weapons[currentWeaponIndex].power}`;
-      refreshStats();
-    } else {
-      text.innerHTML = "You don't have enough gold. Weapons cost 30 gold.";
-    }
-  } else {
-    text.innerHTML = "You already wield the finest weapon! You can sell extras for 15 gold.";
-    button2.innerText = "Sell weapon (15g)";
-    button2.onclick = sellWeapon;
-  }
+// =====================================
+// CANVAS FOUNDATION
+// =====================================
+
+function clearCanvas(){
+
+    ctx.fillStyle = "#111";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
 }
 
-function sellWeapon() {
-  if (inventory.length > 1) {
-    gold += 15;
-    const sold = inventory.shift();
-    text.innerHTML = `You sold a ${sold} for 15 gold.`;
-    refreshStats();
-  } else {
-    text.innerHTML = "You can't sell your only weapon!";
-  }
+function pixel(x,y,size,color){
+
+    ctx.fillStyle = color;
+
+    ctx.fillRect(
+        x,
+        y,
+        size,
+        size
+    );
+
 }
 
-// --- Combat ---
+function drawSky(){
 
-function fightSlime() { fighting = 0; goFight(); }
-function fightBeast() { fighting = 1; goFight(); }
-function fightDragon() { fighting = 2; goFight(); }
+    for(let y=0;y<160;y+=8){
 
-function goFight() {
-  updateLocation(locations[3]);
-  monsterMaxHealth = monsters[fighting].health;
-  monsterHealth = monsterMaxHealth;
-  specialAttackReady = true;
+        pixel(
+            0,
+            y,
+            canvas.width,
+            "#4c7cff"
+        );
 
-  monsterStats.style.display = "block";
-  monsterName.innerText = monsters[fighting].name;
-  monsterLevel.innerText = `Lv. ${monsters[fighting].level}`;
-  updateMonsterHealthBar();
-
-  addCombatLog(`A ${monsters[fighting].name} appears!`, "enemy");
-}
-
-function updateMonsterHealthBar() {
-  const pct = Math.max(0, (monsterHealth / monsterMaxHealth) * 100);
-  monsterHealthBar.style.width = `${pct}%`;
-  monsterHealthText.innerText = `${Math.max(0, monsterHealth)} / ${monsterMaxHealth}`;
-}
-
-function attack() {
-  performAttack(false);
-}
-
-function specialAttack() {
-  if (!specialAttackReady) {
-    text.innerHTML = "Power Strike is recharging! Use a regular attack.";
-    return;
-  }
-  performAttack(true);
-  specialAttackReady = false;
-  button2.className = "action-btn";
-  button2.disabled = true;
-}
-
-function performAttack(isSpecial) {
-  const weapon = weapons[currentWeaponIndex];
-  const monster = monsters[fighting];
-  const logEntries = [];
-  let isCritical = false;
-
-  const monsterDmg = getMonsterAttackValue(monster.level);
-  health -= monsterDmg;
-  logEntries.push({ msg: `${monster.name} hits you for ${monsterDmg} damage.`, type: "enemy" });
-
-  if (isMonsterHit()) {
-    let dmg = weapon.power + getDamageBonus() + Math.floor(Math.random() * (getLevel() + 1));
-
-    if (isSpecial) {
-      dmg = Math.floor(dmg * 2.5);
-      logEntries.push({ msg: `Power Strike! You slam the ${weapon.name} for ${dmg} damage!`, type: "critical" });
-    } else if (Math.random() < 0.15 + getLevel() * 0.01) {
-      dmg = Math.floor(dmg * 1.8);
-      isCritical = true;
-      logEntries.push({ msg: `Critical hit! ${dmg} damage with your ${weapon.name}!`, type: "critical" });
-    } else {
-      logEntries.push({ msg: `You hit for ${dmg} damage.`, type: "player" });
     }
 
-    monsterHealth -= dmg;
-    flashGame("monster-hit");
-  } else {
-    logEntries.push({ msg: "Your attack missed!", type: "player" });
+}
+
+function drawGround(){
+
+    for(let y=160;y<320;y+=8){
+
+        pixel(
+            0,
+            y,
+            canvas.width,
+            "#2c8a3a"
+        );
+
+    }
+
+}
+
+// =====================================
+// INITIALIZE
+// =====================================
+
+function initializeGame(){
+
+    renderStats();
+
+    renderInventory();
+
+    renderEquipment();
+
+    renderQuests();
+
+    clearCanvas();
+
+    drawSky();
+
+    drawGround();
+
+    text.innerHTML =
+    "Welcome to Pixel RPG. Your adventure begins in Town Square.";
+
+}
+
+initializeGame();
+
+// =====================================
+// PART 2
+// COMBAT + LOCATIONS
+// =====================================
+
+// ---------- LOCATION ROUTING ----------
+
+function goTown() {
+
+  currentLocation = "town";
+
+  locationName.textContent =
+      "Town Square";
+
+  text.innerHTML =
+      "The center of civilization. Adventurers gather here.";
+
+  button1.textContent = "Store";
+  button2.textContent = "Forest";
+  button3.textContent = "Dungeon";
+
+  button1.onclick = goStore;
+  button2.onclick = goForest;
+  button3.onclick = goDungeon;
+
+  drawTownScene();
+}
+
+function goStore() {
+
+  currentLocation = "store";
+
+  locationName.textContent =
+      "General Store";
+
+  text.innerHTML =
+      "Potions and supplies line the shelves.";
+
+  button1.textContent =
+      "Buy Potion (10g)";
+
+  button2.textContent =
+      "Blacksmith";
+
+  button3.textContent =
+      "Town";
+
+  button1.onclick = buyPotion;
+  button2.onclick = goBlacksmith;
+  button3.onclick = goTown;
+
+  drawStoreScene();
+}
+
+function goForest() {
+
+  currentLocation = "forest";
+
+  locationName.textContent =
+      "Forest";
+
+  text.innerHTML =
+      "Ancient trees surround you.";
+
+  button1.textContent =
+      "Fight Wolf";
+
+  button2.textContent =
+      "Fight Goblin";
+
+  button3.textContent =
+      "Town";
+
+  button1.onclick =
+      () => startFight("wolf");
+
+  button2.onclick =
+      () => startFight("goblin");
+
+  button3.onclick =
+      goTown;
+
+  drawForestScene();
+}
+
+function goDungeon() {
+
+  currentLocation = "dungeon";
+
+  locationName.textContent =
+      "Dungeon";
+
+  text.innerHTML =
+      "Dark stone corridors stretch ahead.";
+
+  button1.textContent =
+      "Fight Skeleton";
+
+  button2.textContent =
+      "Fight Troll";
+
+  button3.textContent =
+      "Town";
+
+  button1.onclick =
+      () => startFight("skeleton");
+
+  button2.onclick =
+      () => startFight("troll");
+
+  button3.onclick =
+      goTown;
+
+  drawDungeonScene();
+}
+
+function goTemple() {
+
+  currentLocation = "temple";
+
+  locationName.textContent =
+      "Temple";
+
+  text.innerHTML =
+      "Holy light fills the room.";
+
+  button1.textContent =
+      "Heal";
+
+  button2.textContent =
+      "Accept Quest";
+
+  button3.textContent =
+      "Town";
+
+  button1.onclick =
+      healAtTemple;
+
+  button2.onclick =
+      acceptQuest;
+
+  button3.onclick =
+      goTown;
+
+  drawTempleScene();
+}
+
+function goInn() {
+
+  currentLocation = "inn";
+
+  locationName.textContent =
+      "Inn";
+
+  text.innerHTML =
+      "Travelers rest here.";
+
+  button1.textContent =
+      "Rest (15g)";
+
+  button2.textContent =
+      "Temple";
+
+  button3.textContent =
+      "Town";
+
+  button1.onclick =
+      restAtInn;
+
+  button2.onclick =
+      goTemple;
+
+  button3.onclick =
+      goTown;
+
+  drawInnScene();
+}
+
+function goBlacksmith() {
+
+  currentLocation =
+      "blacksmith";
+
+  locationName.textContent =
+      "Blacksmith";
+
+  text.innerHTML =
+      "The forge burns brightly.";
+
+  button1.textContent =
+      "Upgrade Weapon";
+
+  button2.textContent =
+      "Buy Armor";
+
+  button3.textContent =
+      "Town";
+
+  button1.onclick =
+      upgradeWeapon;
+
+  button2.onclick =
+      buyArmor;
+
+  button3.onclick =
+      goTown;
+
+  drawBlacksmithScene();
+}
+
+// =====================================
+// STORE
+// =====================================
+
+function buyPotion() {
+
+  if(PLAYER.gold < 10){
+
+      text.innerHTML =
+          "Not enough gold.";
+
+      return;
   }
 
-  logEntries.forEach(({ msg, type }) => addCombatLog(msg, type));
+  PLAYER.gold -= 10;
 
-  refreshStats();
-  updateMonsterHealthBar();
+  let potion =
+      inventory.consumables.find(
+          c => c.name ===
+          "Health Potion"
+      );
 
-  if (health <= 0) {
-    flashGame("player-hit");
-    lose();
-  } else if (monsterHealth <= 0) {
-    if (fighting === 2) {
-      winGame();
-    } else {
+  if(potion){
+
+      potion.amount++;
+
+  }else{
+
+      inventory.consumables.push({
+
+          name:"Health Potion",
+          amount:1
+
+      });
+
+  }
+
+  renderStats();
+
+  text.innerHTML =
+      "Potion purchased.";
+}
+
+// =====================================
+// BLACKSMITH
+// =====================================
+
+function upgradeWeapon() {
+
+  const cost = 50;
+
+  if(PLAYER.gold < cost){
+
+      text.innerHTML =
+          "Need more gold.";
+
+      return;
+  }
+
+  PLAYER.gold -= cost;
+
+  const weapon =
+      getWeapon();
+
+  weapon.power += 10;
+
+  renderStats();
+
+  text.innerHTML =
+      `${weapon.name}
+      upgraded to
+      ${weapon.power} power`;
+}
+
+function buyArmor() {
+
+  const nextArmor =
+      armors.find(
+          a => a.defense >
+          getArmor().defense
+      );
+
+  if(!nextArmor){
+
+      text.innerHTML =
+          "Best armor owned.";
+
+      return;
+  }
+
+  if(PLAYER.gold <
+     nextArmor.price){
+
+      text.innerHTML =
+          "Not enough gold.";
+
+      return;
+  }
+
+  PLAYER.gold -=
+      nextArmor.price;
+
+  equipment.armor =
+      nextArmor.id;
+
+  renderStats();
+
+  text.innerHTML =
+      `Equipped ${nextArmor.name}`;
+}
+
+// =====================================
+// TEMPLE
+// =====================================
+
+function healAtTemple(){
+
+  PLAYER.hp =
+      PLAYER.maxHp;
+
+  renderStats();
+
+  text.innerHTML =
+      "You feel restored.";
+}
+
+// =====================================
+// INN
+// =====================================
+
+function restAtInn(){
+
+  if(PLAYER.gold < 15){
+
+      text.innerHTML =
+          "Need 15 gold.";
+
+      return;
+  }
+
+  PLAYER.gold -= 15;
+
+  PLAYER.hp =
+      PLAYER.maxHp;
+
+  renderStats();
+
+  text.innerHTML =
+      "You rested peacefully.";
+}
+
+// =====================================
+// QUESTS
+// =====================================
+
+function acceptQuest(){
+
+  const available =
+      questDatabase.find(
+          q =>
+          !activeQuests.some(
+              a=>a.id===q.id
+          )
+      );
+
+  if(!available){
+
+      text.innerHTML =
+          "No quests available.";
+
+      return;
+  }
+
+  activeQuests.push({
+
+      ...available,
+
+      progress:0
+
+  });
+
+  renderQuests();
+
+  text.innerHTML =
+      `Quest Accepted:
+      ${available.title}`;
+}
+
+function updateQuestProgress(
+  monsterId
+){
+
+  activeQuests.forEach(
+      quest=>{
+
+      if(
+          quest.target ===
+          monsterId
+      ){
+
+          quest.progress++;
+
+          if(
+              quest.progress >=
+              quest.required
+          ){
+
+              completeQuest(
+                  quest
+              );
+
+          }
+
+      }
+
+  });
+
+  renderQuests();
+}
+
+function completeQuest(
+  quest
+){
+
+  PLAYER.gold +=
+      quest.rewardGold;
+
+  gainXp(
+      quest.rewardXp
+  );
+
+  activeQuests =
+      activeQuests.filter(
+          q => q.id !==
+          quest.id
+      );
+
+  addLog(
+      `Quest Complete:
+       ${quest.title}`
+  );
+
+  renderStats();
+}
+
+// =====================================
+// COMBAT
+// =====================================
+
+function startFight(id){
+
+  const monster =
+      monsters.find(
+          m=>m.id===id
+      );
+
+  currentMonster =
+      monster;
+
+  monsterCurrentHp =
+      monster.hp;
+
+  monsterStats.style.display =
+      "block";
+
+  monsterName.textContent =
+      monster.name;
+
+  monsterLevel.textContent =
+      `Lv ${monster.level}`;
+
+  updateMonsterBar();
+
+  button1.textContent =
+      "Attack";
+
+  button2.textContent =
+      "Block";
+
+  button3.textContent =
+      "Dodge";
+
+  button1.onclick =
+      attack;
+
+  button2.onclick =
+      blockAttack;
+
+  button3.onclick =
+      dodgeAttack;
+
+  text.innerHTML =
+      `${monster.name}
+      appears!`;
+
+  drawMonster(
+      monster.id
+  );
+}
+
+function updateMonsterBar(){
+
+  monsterHealth.textContent =
+      `${monsterCurrentHp}
+      /${currentMonster.hp}`;
+
+  monsterHealthBar.style.width =
+      `${
+          (
+          monsterCurrentHp /
+          currentMonster.hp
+          )*100
+      }%`;
+}
+
+// =====================================
+// ATTACK
+// =====================================
+
+function attack(){
+
+  const weapon =
+      getWeapon();
+
+  let damage =
+      weapon.power +
+      Math.floor(
+          Math.random()*10
+      );
+
+  if(
+      Math.random() < .15
+  ){
+
+      damage *= 2;
+
+      addLog(
+          "Critical Hit!"
+      );
+
+  }
+
+  monsterCurrentHp -=
+      damage;
+
+  addLog(
+      `You hit for
+      ${damage}`
+  );
+
+  updateMonsterBar();
+
+  if(
+      monsterCurrentHp <= 0
+  ){
+
       defeatMonster();
-    }
-  } else if (Math.random() <= 0.1 && inventory.length > 1) {
-    const broken = inventory.pop();
-    currentWeaponIndex = Math.max(0, currentWeaponIndex - 1);
-    addCombatLog(`Your ${broken} broke!`, "enemy");
-    text.innerHTML += `<br>Your <strong>${broken}</strong> shatters mid-fight!`;
-    refreshStats();
-  } else {
-    const action = isSpecial ? "Power Strike" : isCritical ? "critical hit" : "attack";
-    text.innerHTML = `The ${monster.name} strikes back for <strong>${monsterDmg}</strong> damage. Your ${action} ${monsterHealth > 0 ? `leaves it at ${Math.max(0, monsterHealth)} HP` : "finishes it!"}.`;
+
+      return;
   }
+
+  monsterAttack();
 }
 
-function getMonsterAttackValue(level) {
-  const hit = level * 5 - Math.floor(Math.random() * (xp + getLevel() * 2));
-  return hit > 0 ? hit : 0;
+// =====================================
+// BLOCK
+// =====================================
+
+function blockAttack(){
+
+  const dmg =
+      Math.max(
+          0,
+          getMonsterDamage()
+          - PLAYER.defense
+          - 10
+      );
+
+  PLAYER.hp -= dmg;
+
+  addLog(
+      `Blocked.
+       Took ${dmg}`
+  );
+
+  renderStats();
+
+  checkDefeat();
 }
 
-function isMonsterHit() {
-  return Math.random() > 0.2 || health < 20;
+// =====================================
+// DODGE
+// =====================================
+
+function dodgeAttack(){
+
+  if(
+      Math.random() < .5
+  ){
+
+      addLog(
+          "Dodged!"
+      );
+
+      return;
+  }
+
+  const dmg =
+      getMonsterDamage();
+
+  PLAYER.hp -= dmg;
+
+  addLog(
+      `Failed dodge.
+      ${dmg} damage`
+  );
+
+  renderStats();
+
+  checkDefeat();
 }
 
-function defeatMonster() {
-  const reward = Math.floor(monsters[fighting].level * 6.7);
-  const xpGain = monsters[fighting].level;
-  const oldXp = xp;
-  gold += reward;
-  xp += xpGain;
-  addCombatLog(`Victory! +${xpGain} XP, +${reward} gold.`, "level-up");
-  checkLevelUp(oldXp);
-  refreshStats();
-  updateLocation(locations[4]);
+// =====================================
+// MONSTER ATTACK
+// =====================================
+
+function monsterAttack(){
+
+  const dmg =
+      Math.max(
+          0,
+          getMonsterDamage()
+          -
+          PLAYER.defense
+      );
+
+  PLAYER.hp -= dmg;
+
+  addLog(
+      `${currentMonster.name}
+      hit for ${dmg}`
+  );
+
+  renderStats();
+
+  checkDefeat();
 }
 
-function lose() {
-  updateLocation(locations[5]);
+function getMonsterDamage(){
+
+  return (
+      currentMonster.level * 2
+  ) +
+  Math.floor(
+      Math.random()*10
+  );
 }
 
-function winGame() {
-  updateLocation(locations[6]);
-}
+// =====================================
+// WIN
+// =====================================
 
-function restart() {
-  xp = 0;
-  health = BASE_HEALTH;
-  gold = 50;
-  currentWeaponIndex = 0;
-  inventory = ["stick"];
-  specialAttackReady = true;
-  clearCombatLog();
-  refreshStats();
+function defeatMonster(){
+
+  PLAYER.gold +=
+      currentMonster.gold;
+
+  gainXp(
+      currentMonster.xp
+  );
+
+  updateQuestProgress(
+      currentMonster.id
+  );
+
+  renderStats();
+
+  addLog(
+      `${currentMonster.name}
+      defeated`
+  );
+
+  text.innerHTML =
+      `Victory!
+       +${currentMonster.gold}g
+       +${currentMonster.xp}xp`;
+
+  monsterStats.style.display =
+      "none";
+
+  if(
+      currentMonster.id ===
+      "dragon"
+  ){
+
+      text.innerHTML =
+          "YOU SAVED THE KINGDOM!";
+  }
+
   goTown();
 }
 
-// --- Easter egg ---
+// =====================================
+// DEFEAT
+// =====================================
 
-function easterEgg() {
-  updateLocation(locations[7]);
+function checkDefeat(){
+
+  if(
+      PLAYER.hp > 0
+  ) return;
+
+  PLAYER.hp = 1;
+
+  text.innerHTML =
+      "You were defeated.";
+
+  addLog(
+      "Defeat"
+  );
+
+  goTown();
 }
 
-function pick(guess) {
-  const numbers = [];
-  while (numbers.length < 10) {
-    numbers.push(Math.floor(Math.random() * 11));
-  }
+// =====================================
+// DRAGON BOSS
+// =====================================
 
-  text.innerHTML = `You picked <strong>${guess}</strong>. The numbers drawn: ${numbers.join(", ")}.`;
+function fightDragon(){
 
-  if (numbers.includes(guess)) {
-    text.innerHTML += "<br><br>You win <strong>20 gold</strong>!";
-    gold += 20;
-  } else {
-    text.innerHTML += "<br><br>Wrong! You lose <strong>10 HP</strong>.";
-    health -= 10;
-    if (health <= 0) lose();
-  }
-  refreshStats();
+  startFight(
+      "dragon"
+  );
 }
 
-function pickTwo() { pick(2); }
-function pickEight() { pick(8); }
+// =====================================
+// PART 3
+// PIXEL RENDERER
+// SAVE SYSTEM
+// INVENTORY ACTIONS
+// =====================================
 
-// Initial render
-refreshStats();
+// ---------- ANIMATION ----------
+
+let animationFrame = 0;
+
+function gameLoop() {
+
+    animationFrame++;
+
+    if (
+        currentMonster
+    ) {
+
+        drawMonster(
+            currentMonster.id
+        );
+
+    }
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
+requestAnimationFrame(
+    gameLoop
+);
+
+// =====================================
+// PIXEL HELPERS
+// =====================================
+
+function rect(
+    x,
+    y,
+    w,
+    h,
+    color
+){
+
+    ctx.fillStyle =
+        color;
+
+    ctx.fillRect(
+        x,
+        y,
+        w,
+        h
+    );
+
+}
+
+// =====================================
+// TOWN
+// =====================================
+
+function drawTownScene(){
+
+    clearCanvas();
+
+    drawSky();
+
+    drawGround();
+
+    rect(
+        180,
+        100,
+        120,
+        80,
+        "#9b5a2e"
+    );
+
+    rect(
+        200,
+        70,
+        80,
+        40,
+        "#c0392b"
+    );
+
+}
+
+// =====================================
+// STORE
+// =====================================
+
+function drawStoreScene(){
+
+    clearCanvas();
+
+    rect(
+        0,
+        0,
+        640,
+        320,
+        "#3c2a1e"
+    );
+
+    rect(
+        100,
+        80,
+        400,
+        150,
+        "#654321"
+    );
+
+}
+
+// =====================================
+// FOREST
+// =====================================
+
+function drawForestScene(){
+
+    clearCanvas();
+
+    drawSky();
+
+    drawGround();
+
+    for(
+        let i=0;
+        i<6;
+        i++
+    ){
+
+        rect(
+            50+(i*90),
+            100,
+            25,
+            100,
+            "#5d3a1a"
+        );
+
+        rect(
+            30+(i*90),
+            40,
+            70,
+            70,
+            "#27ae60"
+        );
+
+    }
+
+}
+
+// =====================================
+// DUNGEON
+// =====================================
+
+function drawDungeonScene(){
+
+    clearCanvas();
+
+    rect(
+        0,
+        0,
+        640,
+        320,
+        "#1b1b1b"
+    );
+
+    for(
+        let i=0;
+        i<640;
+        i+=32
+    ){
+
+        rect(
+            i,
+            100,
+            30,
+            120,
+            "#444"
+        );
+
+    }
+
+}
+
+// =====================================
+// TEMPLE
+// =====================================
+
+function drawTempleScene(){
+
+    clearCanvas();
+
+    rect(
+        0,
+        0,
+        640,
+        320,
+        "#f4f4f4"
+    );
+
+    rect(
+        260,
+        60,
+        120,
+        180,
+        "#dcdcdc"
+    );
+
+}
+
+// =====================================
+// INN
+// =====================================
+
+function drawInnScene(){
+
+    clearCanvas();
+
+    rect(
+        0,
+        0,
+        640,
+        320,
+        "#8e5e3b"
+    );
+
+    rect(
+        200,
+        120,
+        220,
+        80,
+        "#5c3d26"
+    );
+
+}
+
+// =====================================
+// BLACKSMITH
+// =====================================
+
+function drawBlacksmithScene(){
+
+    clearCanvas();
+
+    rect(
+        0,
+        0,
+        640,
+        320,
+        "#2b2b2b"
+    );
+
+    rect(
+        350,
+        120,
+        120,
+        90,
+        "#ff6600"
+    );
+
+}
+
+// =====================================
+// MONSTER SPRITES
+// =====================================
+
+function drawMonster(id){
+
+    switch(id){
+
+        case "wolf":
+            drawWolf();
+            break;
+
+        case "goblin":
+            drawGoblin();
+            break;
+
+        case "skeleton":
+            drawSkeleton();
+            break;
+
+        case "troll":
+            drawTroll();
+            break;
+
+        case "dragon":
+            drawDragon();
+            break;
+
+        case "slime":
+            drawSlime();
+            break;
+
+    }
+
+}
+
+function drawSlime(){
+
+    clearCanvas();
+
+    drawGround();
+
+    const bounce =
+        Math.sin(
+            animationFrame * .08
+        ) * 6;
+
+    rect(
+        260,
+        180 + bounce,
+        100,
+        70,
+        "#2ecc71"
+    );
+
+}
+
+function drawWolf(){
+
+    clearCanvas();
+
+    drawGround();
+
+    const walk =
+        Math.sin(
+            animationFrame*.1
+        )*5;
+
+    rect(
+        250+walk,
+        150,
+        120,
+        70,
+        "#999"
+    );
+
+}
+
+function drawGoblin(){
+
+    clearCanvas();
+
+    drawGround();
+
+    const bounce =
+        Math.sin(
+            animationFrame*.08
+        )*8;
+
+    rect(
+        260,
+        140+bounce,
+        90,
+        120,
+        "#2ecc71"
+    );
+
+}
+
+function drawSkeleton(){
+
+    clearCanvas();
+
+    drawGround();
+
+    rect(
+        270,
+        110,
+        70,
+        150,
+        "#f1f1f1"
+    );
+
+}
+
+function drawTroll(){
+
+    clearCanvas();
+
+    drawGround();
+
+    rect(
+        220,
+        100,
+        170,
+        170,
+        "#4caf50"
+    );
+
+}
+
+function drawDragon(){
+
+    clearCanvas();
+
+    const flap =
+        Math.sin(
+            animationFrame*.15
+        )*10;
+
+    rect(
+        160,
+        90,
+        300,
+        150,
+        "#c0392b"
+    );
+
+    rect(
+        100,
+        60-flap,
+        120,
+        60,
+        "#922b21"
+    );
+
+    rect(
+        400,
+        60+flap,
+        120,
+        60,
+        "#922b21"
+    );
+
+}
+
+// =====================================
+// INVENTORY
+// =====================================
+
+function usePotion(){
+
+    const potion =
+        inventory.consumables.find(
+            c =>
+            c.name ===
+            "Health Potion"
+        );
+
+    if(
+        !potion ||
+        potion.amount <= 0
+    ){
+
+        addLog(
+            "No potions."
+        );
+
+        return;
+    }
+
+    potion.amount--;
+
+    PLAYER.hp =
+        Math.min(
+            PLAYER.maxHp,
+            PLAYER.hp + 50
+        );
+
+    renderStats();
+
+    addLog(
+        "Potion used."
+    );
+
+}
+
+function equipWeapon(id){
+
+    if(
+        inventory.weapons.includes(id)
+    ){
+
+        equipment.weapon =
+            id;
+
+        renderEquipment();
+
+        renderStats();
+
+    }
+
+}
+
+function equipArmor(id){
+
+    if(
+        inventory.armor.includes(id)
+    ){
+
+        equipment.armor =
+            id;
+
+        renderEquipment();
+
+        renderStats();
+
+    }
+
+}
+
+// =====================================
+// LOOT
+// =====================================
+
+function rollLoot(monster){
+
+    const chance =
+        Math.random();
+
+    if(
+        chance < .15
+    ){
+
+        inventory.consumables.push({
+
+            name:"Health Potion",
+            amount:1
+
+        });
+
+        addLog(
+            "Potion dropped."
+        );
+
+    }
+
+    if(
+        chance < .05
+    ){
+
+        inventory.weapons.push(
+            "bow"
+        );
+
+        addLog(
+            "Bow found!"
+        );
+
+    }
+
+    renderInventory();
+
+}
+
+// =====================================
+// OVERRIDE WIN
+// =====================================
+
+const originalDefeatMonster =
+    defeatMonster;
+
+defeatMonster = function(){
+
+    rollLoot(
+        currentMonster
+    );
+
+    originalDefeatMonster();
+
+};
+
+// =====================================
+// SAVE SYSTEM
+// =====================================
+
+function saveLocal(){
+
+    localStorage.setItem(
+
+        "pixel-rpg-save",
+
+        JSON.stringify(
+            buildSaveData()
+        )
+
+    );
+
+    addLog(
+        "Game Saved"
+    );
+
+}
+
+function loadLocal(){
+
+    const raw =
+        localStorage.getItem(
+            "pixel-rpg-save"
+        );
+
+    if(!raw) return;
+
+    const data =
+        JSON.parse(raw);
+
+    Object.assign(
+        PLAYER,
+        data.player
+    );
+
+    Object.assign(
+        equipment,
+        data.equipment
+    );
+
+    Object.assign(
+        inventory,
+        data.inventory
+    );
+
+    activeQuests =
+        data.activeQuests || [];
+
+    renderStats();
+
+    renderInventory();
+
+    renderEquipment();
+
+    renderQuests();
+
+    addLog(
+        "Save Loaded"
+    );
+
+}
+
+// =====================================
+// FIREBASE SAVE
+// =====================================
+
+async function saveGameData(){
+
+    if(
+        !currentUser
+    ){
+
+        saveLocal();
+
+        return;
+    }
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/save-game",
+                {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                    "application/json"
+                },
+
+                body:JSON.stringify({
+
+                    uid:
+                    currentUser.uid,
+
+                    gameData:
+                    buildSaveData()
+
+                })
+
+            });
+
+        await response.json();
+
+        addLog(
+            "Cloud Save"
+        );
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        saveLocal();
+
+    }
+
+}
+
+// =====================================
+// FIREBASE LOAD
+// =====================================
+
+async function loadGameData(uid){
+
+    try{
+
+        const response =
+            await fetch(
+            `/api/game-data/${uid}`
+        );
+
+        const data =
+            await response.json();
+
+        if(
+            data.gameData
+        ){
+
+            Object.assign(
+                PLAYER,
+                data.gameData.player
+            );
+
+            Object.assign(
+                inventory,
+                data.gameData.inventory
+            );
+
+            Object.assign(
+                equipment,
+                data.gameData.equipment
+            );
+
+            activeQuests =
+                data.gameData.activeQuests
+                || [];
+
+            renderStats();
+
+            renderInventory();
+
+            renderEquipment();
+
+            renderQuests();
+
+        }
+
+    }
+    catch(err){
+
+        console.error(err);
+
+        loadLocal();
+
+    }
+
+}
+
+// =====================================
+// AUTOSAVE
+// =====================================
+
+setInterval(
+
+    ()=>{
+
+        saveGameData();
+
+    },
+
+    30000
+
+);
+
+// =====================================
+// SAVE BUTTON
+// =====================================
+
+if(saveButton){
+
+    saveButton.onclick =
+        saveGameData;
+
+}
+
+// =====================================
+// GAME START
+// =====================================
+
+function startGame(){
+
+    renderStats();
+
+    renderInventory();
+
+    renderEquipment();
+
+    renderQuests();
+
+    goTown();
+
+    loadLocal();
+
+}
+
+startGame();

@@ -67,73 +67,167 @@
         </div>
     </div>
 
-    <div id="game" style="display: none;">
+    <div id="game" style="display:none;">
+
         <div id="stats">
-            <div class="stat-group">
-                <div class="stat-badge">
-                    <span class="stat-label">Level</span>
+    
+            <div class="stat-grid">
+    
+                <div class="stat-card">
+                    <span>Level</span>
                     <strong id="levelText">1</strong>
                 </div>
-                <div class="stat-badge">
-                    <span class="stat-label">XP</span>
+    
+                <div class="stat-card">
+                    <span>XP</span>
                     <strong id="xpText">0</strong>
                 </div>
-                <div class="stat-badge gold">
-                    <span class="stat-label">Gold</span>
+    
+                <div class="stat-card gold">
+                    <span>Gold</span>
                     <strong id="goldText">50</strong>
                 </div>
+    
+                <div class="stat-card">
+                    <span>Defense</span>
+                    <strong id="defenseText">0</strong>
+                </div>
+    
             </div>
-            <div class="stat-bars">
+    
+            <div class="bars">
+    
                 <div class="bar-row">
-                    <span class="bar-label">HP</span>
+                    <span>HP</span>
+    
                     <div class="bar-track">
                         <div id="healthBar" class="bar-fill health-fill"></div>
                     </div>
-                    <span id="healthText" class="bar-value">100 / 100</span>
+    
+                    <strong id="healthText">100 / 100</strong>
                 </div>
+    
                 <div class="bar-row">
-                    <span class="bar-label">XP</span>
+                    <span>XP</span>
+    
                     <div class="bar-track">
                         <div id="xpBar" class="bar-fill xp-fill"></div>
                     </div>
-                    <span id="xpProgressText" class="bar-value">0 / 10</span>
+    
+                    <strong id="xpProgressText">0 / 10</strong>
                 </div>
+    
             </div>
-            <div class="weapon-row">
-                <span class="weapon-label">Equipped</span>
-                <strong id="weaponText">stick</strong>
+    
+            <div class="equipment-panel">
+    
+                <div>
+                    Weapon:
+                    <strong id="weaponText">Stick</strong>
+                </div>
+    
+                <div>
+                    Armor:
+                    <strong id="armorText">Cloth</strong>
+                </div>
+    
             </div>
-            <button id="save-button" class="save-btn">Save Game</button>
+    
+            <button id="save-button" class="save-btn">
+                Save Game
+            </button>
+    
         </div>
-
+    
         <div id="location-badge">
             <span id="locationName">Town Square</span>
         </div>
-
+    
+        <div id="scene-wrapper">
+    
+            <canvas
+                id="sceneCanvas"
+                width="640"
+                height="320">
+            </canvas>
+    
+        </div>
+    
         <div id="monsterStats">
+    
             <div class="monster-header">
+    
                 <span id="monsterName"></span>
-                <span id="monsterLevel" class="monster-level"></span>
+    
+                <span id="monsterLevel"></span>
+    
             </div>
-            <div class="bar-row monster-bar">
+    
+            <div class="bar-row">
+    
                 <div class="bar-track">
-                    <div id="monsterHealthBar" class="bar-fill monster-fill"></div>
+                    <div
+                        id="monsterHealthBar"
+                        class="bar-fill monster-fill">
+                    </div>
                 </div>
-                <span id="monsterHealth" class="bar-value"></span>
+    
+                <strong id="monsterHealth"></strong>
+    
             </div>
+    
         </div>
-
-        <div id="text">
-            Welcome to Dragon Repeller. You must defeat the dragon that is preventing people from leaving the town. You are in the town square. Where do you want to go?
+    
+        <div id="main-layout">
+    
+            <div id="left-panel">
+    
+                <div id="text"></div>
+    
+                <div id="combat-log"></div>
+    
+            </div>
+    
+            <div id="right-panel">
+    
+                <div class="panel">
+    
+                    <h3>Inventory</h3>
+    
+                    <div id="inventoryList"></div>
+    
+                </div>
+    
+                <div class="panel">
+    
+                    <h3>Equipment</h3>
+    
+                    <div id="equipmentList"></div>
+    
+                </div>
+    
+                <div class="panel">
+    
+                    <h3>Quest Log</h3>
+    
+                    <div id="questList"></div>
+    
+                </div>
+    
+            </div>
+    
         </div>
-
-        <div id="combat-log" aria-live="polite"></div>
-
+    
         <div id="controls">
-            <button id="button1" class="action-btn">Go to store</button>
-            <button id="button2" class="action-btn">Go to cave</button>
-            <button id="button3" class="action-btn">Fight dragon</button>
+    
+            <button id="button1" class="action-btn"></button>
+    
+            <button id="button2" class="action-btn"></button>
+    
+            <button id="button3" class="action-btn"></button>
+    
         </div>
+    
     </div>
 
     <!-- Firebase Config and Auth -->
