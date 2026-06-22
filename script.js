@@ -527,6 +527,37 @@ function renderInventory(){
 
     });
 
+    inventory.armor.forEach(id => {
+
+        const item = armors.find(a => a.id === id);
+
+        if (!item) return;
+
+        const div = document.createElement("div");
+
+        div.className = "inventory-item";
+
+        div.textContent = `${item.name} (${item.defense} DEF)`;
+
+        inventoryList.appendChild(div);
+
+    });
+
+    inventory.consumables.forEach(consumable => {
+
+        const div = document.createElement("div");
+
+        div.className = "inventory-item";
+
+        div.innerHTML = `
+        <strong>${consumable.name}</strong>
+        <small>x${consumable.amount}</small>
+        `;
+
+        inventoryList.appendChild(div);
+
+    });
+
 }
 
 // =====================================
@@ -585,6 +616,7 @@ function renderQuests(){
         <strong>${quest.title}</strong>
         <br>
         ${quest.progress}/${quest.required}
+        <small>${quest.description}</small>
         `;
 
         questList.appendChild(div);
@@ -2086,9 +2118,13 @@ function loadLocal(){
 
 async function saveGameData(){
 
-    if(
-        !currentUser
-    ){
+    const activeUser =
+        window.currentUser ||
+        (typeof auth !== "undefined"
+            ? auth.currentUser
+            : null);
+
+    if(!activeUser){
 
         saveLocal();
 
@@ -2112,7 +2148,7 @@ async function saveGameData(){
                 body:JSON.stringify({
 
                     uid:
-                    currentUser.uid,
+                    activeUser.uid,
 
                     gameData:
                     buildSaveData()
@@ -2120,6 +2156,12 @@ async function saveGameData(){
                 })
 
             });
+
+        if(!response.ok){
+            throw new Error(
+                `Save failed with status ${response.status}`
+            );
+        }
 
         await response.json();
 
@@ -2150,6 +2192,12 @@ async function loadGameData(uid){
             await fetch(
             `/api/game-data/${uid}`
         );
+
+        if(!response.ok){
+            throw new Error(
+                `Load failed with status ${response.status}`
+            );
+        }
 
         const data =
             await response.json();
@@ -2224,6 +2272,47 @@ if(saveButton){
         saveGameData;
 
 }
+
+window.addEventListener("keydown", event => {
+
+    if(
+        document.activeElement &&
+        [
+            "INPUT",
+            "TEXTAREA"
+        ].includes(
+            document.activeElement.tagName
+        )
+    ) return;
+
+    if(
+        event.key === "1" &&
+        button1.textContent
+    ){
+
+        button1.click();
+
+    }
+
+    if(
+        event.key === "2" &&
+        button2.textContent
+    ){
+
+        button2.click();
+
+    }
+
+    if(
+        event.key === "3" &&
+        button3.textContent
+    ){
+
+        button3.click();
+
+    }
+
+});
 
 // =====================================
 // GAME START
