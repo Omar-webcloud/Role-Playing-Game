@@ -11,10 +11,16 @@ const authTabContents = document.querySelectorAll(".auth-tab-content");
 const closeModalBtn = document.querySelector(".close");
 
 window.currentUser = null;
+userDisplay.textContent = "Guest mode - local saves";
+logoutButton.textContent = "Sign In";
+logoutButton.style.display = "inline-flex";
+gameContainer.style.display = "block";
+authModal.style.display = "none";
 
 function setAuthView(user) {
   if (user) {
-    userDisplay.textContent = `Signed in as ${user.email}`;
+    userDisplay.textContent = `Cloud sync on: ${user.email}`;
+    logoutButton.textContent = "Logout";
     logoutButton.style.display = "inline-flex";
     gameContainer.style.display = "block";
     authModal.style.display = "none";
@@ -31,10 +37,11 @@ function setAuthView(user) {
   }
 
   window.currentUser = null;
-  userDisplay.textContent = "Guest mode";
-  logoutButton.style.display = "none";
-  gameContainer.style.display = "none";
-  authModal.style.display = "block";
+  userDisplay.textContent = "Guest mode - local saves";
+  logoutButton.textContent = "Sign In";
+  logoutButton.style.display = "inline-flex";
+  gameContainer.style.display = "block";
+  authModal.style.display = "none";
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -57,9 +64,7 @@ authTabBtns.forEach((btn) => {
 });
 
 closeModalBtn.addEventListener("click", () => {
-  if (auth.currentUser) {
-    authModal.style.display = "none";
-  }
+  authModal.style.display = "none";
 });
 
 loginForm.addEventListener("submit", (event) => {
@@ -105,11 +110,16 @@ signupForm.addEventListener("submit", (event) => {
 });
 
 logoutButton.addEventListener("click", () => {
+  if (!auth.currentUser) {
+    authModal.style.display = "block";
+    return;
+  }
+
   auth.signOut()
     .then(() => {
       window.currentUser = null;
-      authModal.style.display = "block";
-      gameContainer.style.display = "none";
+      authModal.style.display = "none";
+      gameContainer.style.display = "block";
     })
     .catch((error) => {
       console.error("Error signing out:", error);

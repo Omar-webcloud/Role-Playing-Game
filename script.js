@@ -2116,7 +2116,10 @@ function loadLocal(){
 // FIREBASE SAVE
 // =====================================
 
-async function saveGameData(){
+async function saveGameData(options = {}){
+
+    const promptForAuth =
+        options.promptForAuth !== false;
 
     const activeUser =
         window.currentUser ||
@@ -2127,6 +2130,21 @@ async function saveGameData(){
     if(!activeUser){
 
         saveLocal();
+
+        if(
+            promptForAuth &&
+            typeof authModal !== "undefined" &&
+            authModal
+        ){
+
+            authModal.style.display =
+                "block";
+
+            addLog(
+                "Sign in to sync saves."
+            );
+
+        }
 
         return;
     }
@@ -2254,7 +2272,9 @@ setInterval(
 
     ()=>{
 
-        saveGameData();
+        saveGameData({
+            promptForAuth:false
+        });
 
     },
 
