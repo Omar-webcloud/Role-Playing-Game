@@ -727,15 +727,130 @@ function pixel(x,y,size,color){
 
 }
 
+function fillBands(bands){
+
+    bands.forEach(
+        band => {
+
+            rect(
+                0,
+                band.y,
+                canvas.width,
+                band.h,
+                band.color
+            );
+
+        }
+    );
+
+}
+
+function drawCloud(x, y, scale = 1){
+
+    const s = 8 * scale;
+    const p = (dx, dy, w, h, color = "#f5fbff") => rect(x + dx * s, y + dy * s, w * s, h * s, color);
+
+    p(0, 1, 2, 1);
+    p(1, 0, 2, 2);
+    p(2, 0, 2, 3);
+    p(3, 1, 3, 2);
+    p(5, 1, 2, 1);
+    p(6, 0, 2, 2);
+    p(7, 1, 2, 1);
+
+}
+
+function drawStar(x, y, color = "#fff5cf"){
+
+    rect(x, y, 4, 4, color);
+    rect(x + 4, y + 4, 4, 4, color);
+    rect(x + 4, y, 4, 4, color);
+    rect(x, y + 4, 4, 4, color);
+
+}
+
+function drawPath(x, y, w, h, color = "#caa46a"){
+
+    rect(x, y, w, h, color);
+    rect(x + 6, y + 2, w - 12, h - 4, "#b78f54");
+    rect(x + 12, y + 4, w - 24, h - 8, "#9f7742");
+
+}
+
+function drawHouse(x, y, scale = 1, wall = "#9d6438", roof = "#ba5143", trim = "#f0d2a2"){
+
+    const s = 8 * scale;
+    const p = (dx, dy, w, h, color) => rect(x + dx * s, y + dy * s, w * s, h * s, color);
+
+    p(2, 3, 10, 7, wall);
+    p(1, 2, 12, 2, roof);
+    p(2, 1, 10, 1, roof);
+    p(3, 0, 8, 1, roof);
+    p(5, 5, 2, 5, trim);
+    p(4, 5, 1, 1, "#d2b27d");
+    p(7, 5, 1, 1, "#d2b27d");
+    p(2, 3, 1, 7, "#6b4325");
+    p(11, 3, 1, 7, "#6b4325");
+    p(5, 7, 2, 3, "#41261a");
+    p(5, 4, 2, 1, "#f8de8a");
+
+}
+
+function drawFence(x, y, count = 6){
+
+    for(
+        let i = 0;
+        i < count;
+        i++
+    ){
+
+        rect(x + i * 18, y, 6, 22, "#a57a46");
+        rect(x + i * 18 - 2, y + 8, 10, 3, "#c69c62");
+
+    }
+
+}
+
+function drawTree(x, y, scale = 1, trunk = "#5c3a1c", leaf = "#2f9a52"){
+
+    const s = 8 * scale;
+    const p = (dx, dy, w, h, color) => rect(x + dx * s, y + dy * s, w * s, h * s, color);
+
+    p(2, 5, 1, 4, trunk);
+    p(3, 5, 1, 4, trunk);
+    p(1, 2, 5, 3, leaf);
+    p(0, 3, 7, 2, leaf);
+    p(1, 1, 5, 2, leaf);
+    p(2, 0, 3, 1, leaf);
+
+}
+
+function drawTorch(x, y){
+
+    rect(x, y, 4, 18, "#6b4325");
+    rect(x - 2, y - 8, 8, 8, "#ffcf66");
+    rect(x - 1, y - 12, 6, 6, "#fff3a2");
+
+}
+
 function drawSky(){
 
-    for(let y=0;y<160;y+=8){
+    fillBands([
+        { y: 0, h: 48, color: "#6d9cff" },
+        { y: 48, h: 56, color: "#5f88ef" },
+        { y: 104, h: 56, color: "#436cc6" }
+    ]);
 
-        pixel(
-            0,
-            y,
-            canvas.width,
-            "#4c7cff"
+    for(
+        let i = 0;
+        i < 7;
+        i++
+    ){
+
+        drawCloud(
+            40 + i * 82,
+            18 + (i % 2) * 10,
+            i % 3 === 0 ? 1.1 : 1
         );
 
     }
@@ -744,13 +859,32 @@ function drawSky(){
 
 function drawGround(){
 
-    for(let y=160;y<320;y+=8){
+    fillBands([
+        { y: 160, h: 56, color: "#315d2d" },
+        { y: 216, h: 56, color: "#274824" },
+        { y: 272, h: 48, color: "#1f341d" }
+    ]);
 
-        pixel(
-            0,
-            y,
-            canvas.width,
-            "#2c8a3a"
+    for(
+        let x = 0;
+        x < canvas.width;
+        x += 16
+    ){
+
+        rect(
+            x,
+            156 + (x % 32 === 0 ? 2 : 0),
+            8,
+            4,
+            "#78a45a"
+        );
+
+        rect(
+            x + 6,
+            244 + (x % 48 === 0 ? 1 : 0),
+            10,
+            3,
+            "#3c6b33"
         );
 
     }
@@ -1577,21 +1711,15 @@ function drawTownScene(){
 
     drawGround();
 
-    rect(
-        180,
-        100,
-        120,
-        80,
-        "#9b5a2e"
-    );
-
-    rect(
-        200,
-        70,
-        80,
-        40,
-        "#c0392b"
-    );
+    drawPath(238, 160, 164, 92);
+    drawHouse(172, 76, 1.1);
+    drawHouse(330, 84, 0.9, "#ad7241", "#d86c4e", "#f7dfb1");
+    drawFence(96, 216, 4);
+    drawFence(456, 216, 4);
+    drawTree(38, 164, 1);
+    drawTree(558, 164, 1);
+    drawTorch(150, 210);
+    drawTorch(490, 210);
 
 }
 
@@ -1603,21 +1731,18 @@ function drawStoreScene(){
 
     clearCanvas();
 
-    rect(
-        0,
-        0,
-        640,
-        320,
-        "#3c2a1e"
-    );
+    fillBands([
+        { y: 0, h: 160, color: "#6c4b30" },
+        { y: 160, h: 160, color: "#3c2619" }
+    ]);
 
-    rect(
-        100,
-        80,
-        400,
-        150,
-        "#654321"
-    );
+    drawHouse(144, 64, 1.45, "#855335", "#c46e3b", "#efd7ab");
+    drawFence(68, 222, 8);
+    drawFence(468, 222, 8);
+    drawTorch(118, 200);
+    drawTorch(514, 200);
+    rect(266, 132, 108, 36, "#f0cf7c");
+    rect(274, 138, 92, 24, "#7e532e");
 
 }
 
@@ -1633,29 +1758,16 @@ function drawForestScene(){
 
     drawGround();
 
-    for(
-        let i=0;
-        i<6;
-        i++
-    ){
-
-        rect(
-            50+(i*90),
-            100,
-            25,
-            100,
-            "#5d3a1a"
-        );
-
-        rect(
-            30+(i*90),
-            40,
-            70,
-            70,
-            "#27ae60"
-        );
-
-    }
+    rect(220, 166, 200, 24, "#7a5a30");
+    rect(232, 160, 176, 12, "#9a7b4a");
+    drawTree(24, 140, 1.1);
+    drawTree(110, 130, 0.9, "#4f3115", "#1f7d41");
+    drawTree(188, 146, 1.2, "#5b371b", "#2f8f4d");
+    drawTree(470, 136, 1.1, "#57361a", "#238046");
+    drawTree(548, 144, 0.95, "#5c3a1c", "#2d9650");
+    drawTree(346, 120, 1.35, "#4f3115", "#2b7f45");
+    drawCloud(450, 24, 0.9);
+    drawCloud(92, 36, 0.8);
 
 }
 
@@ -1667,29 +1779,29 @@ function drawDungeonScene(){
 
     clearCanvas();
 
-    rect(
-        0,
-        0,
-        640,
-        320,
-        "#1b1b1b"
-    );
+    fillBands([
+        { y: 0, h: 88, color: "#171724" },
+        { y: 88, h: 96, color: "#232334" },
+        { y: 184, h: 136, color: "#11131d" }
+    ]);
 
     for(
-        let i=0;
-        i<640;
-        i+=32
+        let x = 0;
+        x < 640;
+        x += 40
     ){
 
-        rect(
-            i,
-            100,
-            30,
-            120,
-            "#444"
-        );
+        rect(x, 92, 34, 132, "#3c404e");
+        rect(x + 4, 100, 26, 116, "#2a2d39");
+        rect(x + 8, 110, 18, 8, "#666b7d");
 
     }
+
+    rect(116, 58, 408, 22, "#44495b");
+    rect(124, 66, 392, 10, "#2f3442");
+    rect(160, 204, 320, 10, "#4a4f60");
+    drawTorch(82, 204);
+    drawTorch(550, 204);
 
 }
 
@@ -1701,21 +1813,20 @@ function drawTempleScene(){
 
     clearCanvas();
 
-    rect(
-        0,
-        0,
-        640,
-        320,
-        "#f4f4f4"
-    );
+    fillBands([
+        { y: 0, h: 148, color: "#dce4ef" },
+        { y: 148, h: 172, color: "#bfcad8" }
+    ]);
 
-    rect(
-        260,
-        60,
-        120,
-        180,
-        "#dcdcdc"
-    );
+    rect(236, 64, 168, 168, "#e7edf5");
+    rect(252, 80, 136, 136, "#cdd8e4");
+    rect(272, 48, 96, 26, "#f7f0c2");
+    rect(296, 82, 48, 104, "#7b8aa0");
+    rect(284, 70, 72, 8, "#f8f0c7");
+    drawTorch(184, 196);
+    drawTorch(454, 196);
+    drawCloud(92, 30, 0.7);
+    drawCloud(506, 34, 0.7);
 
 }
 
@@ -1727,21 +1838,18 @@ function drawInnScene(){
 
     clearCanvas();
 
-    rect(
-        0,
-        0,
-        640,
-        320,
-        "#8e5e3b"
-    );
+    fillBands([
+        { y: 0, h: 138, color: "#a66a42" },
+        { y: 138, h: 182, color: "#6f452c" }
+    ]);
 
-    rect(
-        200,
-        120,
-        220,
-        80,
-        "#5c3d26"
-    );
+    drawHouse(166, 76, 1.15, "#7b4d31", "#8d442f", "#efd7a9");
+    rect(224, 148, 192, 28, "#5d3821");
+    rect(236, 156, 168, 12, "#3d2415");
+    drawFence(102, 218, 6);
+    drawFence(452, 218, 6);
+    drawTorch(208, 192);
+    drawTorch(428, 192);
 
 }
 
@@ -1753,21 +1861,19 @@ function drawBlacksmithScene(){
 
     clearCanvas();
 
-    rect(
-        0,
-        0,
-        640,
-        320,
-        "#2b2b2b"
-    );
+    fillBands([
+        { y: 0, h: 160, color: "#2a2322" },
+        { y: 160, h: 160, color: "#140f10" }
+    ]);
 
-    rect(
-        350,
-        120,
-        120,
-        90,
-        "#ff6600"
-    );
+    rect(196, 126, 248, 86, "#42312c");
+    rect(212, 108, 216, 18, "#5a3c2e");
+    rect(228, 96, 184, 16, "#7d4b2f");
+    rect(322, 116, 36, 52, "#ffd36d");
+    rect(306, 124, 68, 36, "#ff7a28");
+    rect(314, 132, 52, 20, "#ffb14d");
+    drawTorch(146, 198);
+    drawTorch(510, 198);
 
 }
 
@@ -1807,6 +1913,19 @@ function drawMonster(id){
 
 }
 
+function monsterBob(speed, amount){
+
+    return Math.sin(animationFrame * speed) * amount;
+
+}
+
+function drawEyes(x, y, color = "#fff"){
+
+    rect(x, y, 6, 6, color);
+    rect(x + 16, y, 6, 6, color);
+
+}
+
 function drawSlime(){
 
     clearCanvas();
@@ -1814,17 +1933,15 @@ function drawSlime(){
     drawGround();
 
     const bounce =
-        Math.sin(
-            animationFrame * .08
-        ) * 6;
+        monsterBob(.08, 6);
 
-    rect(
-        260,
-        180 + bounce,
-        100,
-        70,
-        "#2ecc71"
-    );
+    rect(220, 192 + bounce, 200, 68, "#0d5c31");
+    rect(228, 184 + bounce, 184, 56, "#1f9e52");
+    rect(238, 176 + bounce, 164, 44, "#35d16c");
+    rect(254, 204 + bounce, 132, 28, "#1a7d40");
+    drawEyes(278, 194 + bounce);
+    rect(316, 210 + bounce, 12, 8, "#8cf4ab");
+    rect(300, 220 + bounce, 44, 8, "#0c4023");
 
 }
 
@@ -1835,17 +1952,19 @@ function drawWolf(){
     drawGround();
 
     const walk =
-        Math.sin(
-            animationFrame*.1
-        )*5;
+        monsterBob(.1, 5);
 
-    rect(
-        250+walk,
-        150,
-        120,
-        70,
-        "#999"
-    );
+    rect(196 + walk, 162, 180, 74, "#2a2e34");
+    rect(208 + walk, 154, 160, 54, "#747a83");
+    rect(232 + walk, 144, 44, 34, "#8c9299");
+    rect(262 + walk, 130, 28, 24, "#8c9299");
+    rect(278 + walk, 140, 8, 8, "#111");
+    rect(286 + walk, 164, 14, 14, "#f7f7f7");
+    rect(216 + walk, 212, 22, 28, "#2a2e34");
+    rect(250 + walk, 212, 22, 28, "#2a2e34");
+    rect(316 + walk, 212, 22, 28, "#2a2e34");
+    rect(350 + walk, 212, 18, 28, "#2a2e34");
+    rect(354 + walk, 176, 34, 10, "#747a83");
 
 }
 
@@ -1856,17 +1975,19 @@ function drawGoblin(){
     drawGround();
 
     const bounce =
-        Math.sin(
-            animationFrame*.08
-        )*8;
+        monsterBob(.08, 8);
 
-    rect(
-        260,
-        140+bounce,
-        90,
-        120,
-        "#2ecc71"
-    );
+    rect(248, 136 + bounce, 144, 136, "#125d34");
+    rect(260, 124 + bounce, 120, 96, "#26a953");
+    rect(276, 108 + bounce, 88, 56, "#2fcf67");
+    rect(286, 102 + bounce, 24, 16, "#111");
+    rect(330, 102 + bounce, 24, 16, "#111");
+    rect(296, 126 + bounce, 16, 10, "#fff0b2");
+    rect(294, 162 + bounce, 24, 14, "#8d3d2c");
+    rect(270, 220 + bounce, 22, 26, "#125d34");
+    rect(318, 220 + bounce, 22, 26, "#125d34");
+    rect(234, 146 + bounce, 22, 56, "#26a953");
+    rect(360, 146 + bounce, 22, 56, "#26a953");
 
 }
 
@@ -1876,13 +1997,20 @@ function drawSkeleton(){
 
     drawGround();
 
-    rect(
-        270,
-        110,
-        70,
-        150,
-        "#f1f1f1"
-    );
+    const sway =
+        monsterBob(.05, 3);
+
+    rect(256, 114, 128, 150, "#4b4d53");
+    rect(268, 102, 104, 134, "#f3f1ea");
+    rect(280, 116, 80, 18, "#1b1b1b");
+    rect(292, 128, 12, 12, "#1b1b1b");
+    rect(332, 128, 12, 12, "#1b1b1b");
+    rect(304, 146, 16, 20, "#b9b2a5");
+    rect(280, 168, 64, 12, "#dcd6ca");
+    rect(262, 150, 20, 82, "#f3f1ea");
+    rect(354, 150, 20, 82, "#f3f1ea");
+    rect(290, 248 + sway, 22, 28, "#f3f1ea");
+    rect(328, 248 - sway, 22, 28, "#f3f1ea");
 
 }
 
@@ -1892,13 +2020,19 @@ function drawTroll(){
 
     drawGround();
 
-    rect(
-        220,
-        100,
-        170,
-        170,
-        "#4caf50"
-    );
+    const sway =
+        monsterBob(.06, 4);
+
+    rect(184, 122 + sway, 260, 154, "#14431f");
+    rect(206, 104 + sway, 216, 118, "#2a8d43");
+    rect(228, 88 + sway, 172, 72, "#47b85e");
+    rect(248, 106 + sway, 24, 18, "#1b1b1b");
+    rect(340, 106 + sway, 24, 18, "#1b1b1b");
+    rect(288, 136 + sway, 48, 14, "#d16b52");
+    rect(214, 208 + sway, 34, 52, "#14431f");
+    rect(392, 208 + sway, 34, 52, "#14431f");
+    rect(250, 188 + sway, 26, 24, "#2a8d43");
+    rect(364, 188 + sway, 26, 24, "#2a8d43");
 
 }
 
@@ -1907,33 +2041,31 @@ function drawDragon(){
     clearCanvas();
 
     const flap =
-        Math.sin(
-            animationFrame*.15
-        )*10;
+        monsterBob(.15, 10);
 
-    rect(
-        160,
-        90,
-        300,
-        150,
-        "#c0392b"
-    );
+    fillBands([
+        { y: 0, h: 156, color: "#5e88f0" },
+        { y: 156, h: 164, color: "#284522" }
+    ]);
 
-    rect(
-        100,
-        60-flap,
-        120,
-        60,
-        "#922b21"
-    );
-
-    rect(
-        400,
-        60+flap,
-        120,
-        60,
-        "#922b21"
-    );
+    rect(114, 108, 344, 118, "#7f1f22");
+    rect(144, 94, 286, 74, "#b83333");
+    rect(174, 78, 206, 48, "#e15345");
+    rect(248, 128, 76, 42, "#fff1ce");
+    rect(272, 136, 12, 12, "#1d1d1d");
+    rect(302, 136, 12, 12, "#1d1d1d");
+    rect(234, 116, 24, 12, "#fff1ce");
+    rect(350, 116, 24, 12, "#fff1ce");
+    rect(86, 72 - flap, 132, 56, "#7d1f24");
+    rect(422, 72 + flap, 132, 56, "#7d1f24");
+    rect(68, 88 - flap, 54, 20, "#ffa54c");
+    rect(510, 88 + flap, 54, 20, "#ffa54c");
+    rect(154, 196, 80, 20, "#611316");
+    rect(404, 196, 80, 20, "#611316");
+    rect(180, 206, 24, 28, "#521215");
+    rect(438, 206, 24, 28, "#521215");
+    drawStar(38, 26, "#ffeaa1");
+    drawStar(570, 34, "#ffeaa1");
 
 }
 
