@@ -582,6 +582,12 @@ header {
   text-transform: uppercase;
 }
 
+.panel-icon {
+  margin-right: 8px;
+  font-size: 1rem;
+  vertical-align: -0.08em;
+}
+
 #inventoryList,
 #equipmentList,
 #questList {
@@ -626,6 +632,7 @@ header {
   font-weight: 800;
   line-height: 1.35;
   letter-spacing: 0.01em;
+  white-space: normal;
   box-shadow: 0 14px 30px rgba(255, 184, 77, 0.18);
   transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
@@ -797,4 +804,3 @@ header {
     font-size: 0.95rem;
   }
 }
-

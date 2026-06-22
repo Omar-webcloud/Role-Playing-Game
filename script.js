@@ -47,6 +47,56 @@ const ctx = canvas.getContext("2d");
 
 ctx.imageSmoothingEnabled = false;
 
+const actionIcons = {
+
+    "Store":"🏪",
+    "Forest":"🌲",
+    "Dungeon":"🕳️",
+    "Buy Potion (10g)":"🧪",
+    "Blacksmith":"⚒️",
+    "Town":"🏘️",
+    "Fight Wolf":"🐺",
+    "Fight Goblin":"👺",
+    "Fight Skeleton":"☠️",
+    "Fight Troll":"🪨",
+    "Heal":"✚",
+    "Accept Quest":"📜",
+    "Rest (15g)":"🛏️",
+    "Temple":"⛪",
+    "Upgrade Weapon":"⚔️",
+    "Buy Armor":"🛡️",
+    "Attack":"⚔️",
+    "Block":"🛡️",
+    "Dodge":"↩️",
+    "Shadow Lord":"👤",
+    "Ancient Dragon":"🐉"
+
+};
+
+function withIcon(label){
+
+    const icon =
+        actionIcons[label];
+
+    return icon
+        ? `${icon} ${label}`
+        : label;
+
+}
+
+function setActionButtons(first, second, third){
+
+    button1.textContent =
+        withIcon(first);
+
+    button2.textContent =
+        withIcon(second);
+
+    button3.textContent =
+        withIcon(third);
+
+}
+
 // =====================================
 // GAME DATA
 // =====================================
@@ -751,9 +801,7 @@ function goTown() {
   text.innerHTML =
       "The center of civilization. Adventurers gather here.";
 
-  button1.textContent = "Store";
-  button2.textContent = "Forest";
-  button3.textContent = "Dungeon";
+  setActionButtons("Store", "Forest", "Dungeon");
 
   button1.onclick = goStore;
   button2.onclick = goForest;
@@ -772,14 +820,11 @@ function goStore() {
   text.innerHTML =
       "Potions and supplies line the shelves.";
 
-  button1.textContent =
-      "Buy Potion (10g)";
-
-  button2.textContent =
-      "Blacksmith";
-
-  button3.textContent =
-      "Town";
+  setActionButtons(
+      "Buy Potion (10g)",
+      "Blacksmith",
+      "Town"
+  );
 
   button1.onclick = buyPotion;
   button2.onclick = goBlacksmith;
@@ -798,14 +843,11 @@ function goForest() {
   text.innerHTML =
       "Ancient trees surround you.";
 
-  button1.textContent =
-      "Fight Wolf";
-
-  button2.textContent =
-      "Fight Goblin";
-
-  button3.textContent =
-      "Town";
+  setActionButtons(
+      "Fight Wolf",
+      "Fight Goblin",
+      "Town"
+  );
 
   button1.onclick =
       () => startFight("wolf");
@@ -829,14 +871,11 @@ function goDungeon() {
   text.innerHTML =
       "Dark stone corridors stretch ahead.";
 
-  button1.textContent =
-      "Fight Skeleton";
-
-  button2.textContent =
-      "Fight Troll";
-
-  button3.textContent =
-      "Town";
+  setActionButtons(
+      "Fight Skeleton",
+      "Fight Troll",
+      "Town"
+  );
 
   button1.onclick =
       () => startFight("skeleton");
@@ -860,14 +899,11 @@ function goTemple() {
   text.innerHTML =
       "Holy light fills the room.";
 
-  button1.textContent =
-      "Heal";
-
-  button2.textContent =
-      "Accept Quest";
-
-  button3.textContent =
-      "Town";
+  setActionButtons(
+      "Heal",
+      "Accept Quest",
+      "Town"
+  );
 
   button1.onclick =
       healAtTemple;
@@ -891,14 +927,11 @@ function goInn() {
   text.innerHTML =
       "Travelers rest here.";
 
-  button1.textContent =
-      "Rest (15g)";
-
-  button2.textContent =
-      "Temple";
-
-  button3.textContent =
-      "Town";
+  setActionButtons(
+      "Rest (15g)",
+      "Temple",
+      "Town"
+  );
 
   button1.onclick =
       restAtInn;
@@ -923,14 +956,11 @@ function goBlacksmith() {
   text.innerHTML =
       "The forge burns brightly.";
 
-  button1.textContent =
-      "Upgrade Weapon";
-
-  button2.textContent =
-      "Buy Armor";
-
-  button3.textContent =
-      "Town";
+  setActionButtons(
+      "Upgrade Weapon",
+      "Buy Armor",
+      "Town"
+  );
 
   button1.onclick =
       upgradeWeapon;
@@ -1217,14 +1247,11 @@ function startFight(id){
 
   updateMonsterBar();
 
-  button1.textContent =
-      "Attack";
-
-  button2.textContent =
-      "Block";
-
-  button3.textContent =
-      "Dodge";
+  setActionButtons(
+      "Attack",
+      "Block",
+      "Dodge"
+  );
 
   button1.onclick =
       attack;
@@ -3022,14 +3049,11 @@ function unlockEndgame(){
         !achievements.dragonSlayer
     ) return;
 
-    button1.textContent =
-        "Shadow Lord";
-
-    button2.textContent =
-        "Ancient Dragon";
-
-    button3.textContent =
-        "Town";
+    setActionButtons(
+        "Shadow Lord",
+        "Ancient Dragon",
+        "Town"
+    );
 
     button1.onclick =
         fightShadowLord;
