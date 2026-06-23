@@ -43,9 +43,23 @@ const locationName = document.querySelector("#locationName");
 const combatLog = document.querySelector("#combat-log");
 
 const canvas = document.querySelector("#sceneCanvas");
-const ctx = canvas.getContext("2d");
+const sceneApp = new PIXI.Application({
+    view: canvas,
+    width: canvas.width,
+    height: canvas.height,
+    backgroundColor: 0x111111,
+    antialias: false,
+    autoDensity: true,
+    resolution: 1
+});
 
-ctx.imageSmoothingEnabled = false;
+sceneApp.renderer.roundPixels = true;
+
+const sceneLayer = new PIXI.Graphics();
+
+sceneApp.stage.addChild(
+    sceneLayer
+);
 
 const actionIcons = {
 
@@ -703,26 +717,31 @@ function buildSaveData(){
 
 function clearCanvas(){
 
-    ctx.fillStyle = "#111";
+    sceneLayer.clear();
 
-    ctx.fillRect(
+    sceneLayer.beginFill(
+        PIXI.utils.string2hex("#111111")
+    );
+
+    sceneLayer.drawRect(
         0,
         0,
         canvas.width,
         canvas.height
     );
 
+    sceneLayer.endFill();
+
 }
 
 function pixel(x,y,size,color){
 
-    ctx.fillStyle = color;
-
-    ctx.fillRect(
+    rect(
         x,
         y,
         size,
-        size
+        size,
+        color
     );
 
 }
@@ -1651,9 +1670,9 @@ function fightDragon(){
 
 let animationFrame = 0;
 
-function gameLoop() {
+function gameLoop(delta) {
 
-    animationFrame++;
+    animationFrame += delta;
 
     if (
         currentMonster
@@ -1665,13 +1684,9 @@ function gameLoop() {
 
     }
 
-    requestAnimationFrame(
-        gameLoop
-    );
-
 }
 
-requestAnimationFrame(
+sceneApp.ticker.add(
     gameLoop
 );
 
@@ -1687,15 +1702,18 @@ function rect(
     color
 ){
 
-    ctx.fillStyle =
-        color;
+    sceneLayer.beginFill(
+        PIXI.utils.string2hex(color)
+    );
 
-    ctx.fillRect(
+    sceneLayer.drawRect(
         x,
         y,
         w,
         h
     );
+
+    sceneLayer.endFill();
 
 }
 
